@@ -134,6 +134,37 @@ async def get_youtube_batch(limit: int = Query(8, le=12)):
     return {"data": results, "source": "Last.fm + YouTube Data API v3"}
 
 
+@router.get("/reddit-insight")
+async def get_reddit_insight(title: str = Query(..., min_length=2), subreddit: str = Query("Music")):
+    """
+    Gemini AI phân tích insight cho một bài đăng Reddit cụ thể .
+    """
+    from app.ai.gemini_service import analyze_country_insight
+    prompt = f"""Bạn là chuyên gia phân tích dữ liệu mạng xã hội và thị trường âm nhạc.
+
+Dưới đây là một bài đăng đang trending trên Reddit (r/{subreddit}):
+"{title}"
+
+Viết báo cáo NGẮN GỌN (150-200 từ, tiếng Việt) gồm 4 đoạn liên tiếp, mỗi đoạn 2-3 câu, bắt đầu bằng nhãn rồi hai chấm:
+
+Chủ đề chính: Bài đăng bàn luận về vấn đề gì.
+Mức độ quan tâm: Tại sao chủ đề này thu hút cộng đồng r/{subreddit} lúc này.
+Góc nhìn cộng đồng: Phản ứng người nghe (tích cực, tiêu cực, hay tranh cãi).
+Tác động: Có thể ảnh hưởng đến xu hướng nghe nhạc hoặc nghệ sĩ liên quan thế nào.
+
+QUAN TRỌNG: Plain text thuần, không markdown, không ## hay **."""
+
+    import urllib.parse
+    safe_title = urllib.parse.quote_plus(title[:50])
+    insight = await analyze_country_insight(prompt, cache_key=f"reddit_insight_{safe_title}")
+    
+    return {
+        "insight": insight,
+        "post": title,
+        "source": f"Reddit r/{subreddit} + Gemini AI"
+    }
+
+
 @router.get("/youtube/search")
 async def youtube_search(q: str = Query(..., min_length=2)):
     """Tìm MV trên YouTube."""

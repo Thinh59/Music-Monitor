@@ -15,6 +15,7 @@ from datetime import date
 
 import google.generativeai as genai
 from app.config import settings
+from app.ai.text_clean import strip_markdown
 
 # ── Khởi tạo model 1 lần ─────────────────────────────────────────────────────
 genai.configure(api_key=settings.gemini_api_key)
@@ -57,7 +58,7 @@ async def _call_gemini(prompt: str, max_tokens: int = 600, retries: int = 3) -> 
                     max_output_tokens=max_tokens,
                 ),
             )
-            return response.text
+            return strip_markdown(response.text)
         except Exception as e:
             err_str = str(e)
             is_rate  = "429" in err_str or "quota" in err_str.lower() or "rate" in err_str.lower()

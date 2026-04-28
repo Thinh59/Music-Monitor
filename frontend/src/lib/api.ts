@@ -87,6 +87,21 @@ export async function fetchYouTubeTrend(videoId: string) {
   return get(`/api/trends/youtube/${videoId}`);
 }
 
+/** Tổng hợp trends overview — dùng cho KPI cards */
+export async function fetchTrendsOverview() {
+  return get("/api/trends/overview");
+}
+
+/** Top tracks → YouTube MV stats parallel — dùng cho Growth chart */
+export async function fetchYouTubeBatch() {
+  return get("/api/trends/youtube/batch");
+}
+
+/** TikTok viral list — dùng cho Viral heatmap */
+export async function fetchTikTokTrends() {
+  return get("/api/trends/tiktok");
+}
+
 // ─── Dashboard tổng hợp ─────────────────────────────────────────────────────
 
 /**

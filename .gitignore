@@ -50,3 +50,11 @@ firebase-cert.json
 backend/firebase-cert.json
 map_cache.json
 backend/map_cache.json
+
+# Test outputs
+testsprite_tests/
+**/testsprite_tests/
+
+# Runtime caches
+*.cache
+backend/.cache

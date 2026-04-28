@@ -28,33 +28,55 @@ def _fallback_briefing(
     tiktok_tracks: list,
     reddit_posts:  list,
     sentiment:     dict,
-) -> str:
-    """Tạo briefing dạng template khi Gemini không khả dụng."""
+) -> dict:
+    """Tạo briefing structured khi Gemini không khả dụng — không dùng markdown."""
     today_str  = date.today().strftime("%d/%m/%Y")
-    tops       = "\n".join([f"  {i+1}. **{t['name']}** — {t['artist']}" for i, t in enumerate(lf_tracks[:5])])
-    tiktoks    = "\n".join([f"  {i+1}. {t['name']} — {t['artist']}"    for i, t in enumerate(tiktok_tracks[:3])])
-    hot_reddit = reddit_posts[0]["title"][:80] if reddit_posts else "Không có dữ liệu"
     sent_label = (
-        "Tích cực 😊" if sentiment.get("compound", 0) > 0.05
-        else "Tiêu cực 😠" if sentiment.get("compound", 0) < -0.05
-        else "Trung tính 😐"
+        "Tích cực" if sentiment.get("compound", 0) > 0.05
+        else "Tiêu cực" if sentiment.get("compound", 0) < -0.05
+        else "Trung tính"
     )
-    return f"""## 🌅 Daily Music Briefing — {today_str}
+    hot_reddit = reddit_posts[0]["title"][:120] if reddit_posts else "Không có dữ liệu"
 
-> *(Chế độ tóm tắt — AI đang tạm nghỉ để tiết kiệm quota)*
+    overview = (
+        f"Báo cáo nhanh ngày {today_str}. AI tạm nghỉ để tiết kiệm quota — "
+        f"dữ liệu dưới đây được tổng hợp tự động từ Last.fm, Deezer và Reddit."
+    )
 
-## 📊 Top Charts (Last.fm Global)
-{tops}
+    top_charts_lines = [
+        f"{i+1}. {t['name']} — {t['artist']}"
+        for i, t in enumerate(lf_tracks[:5])
+    ]
+    tiktok_lines = [
+        f"{i+1}. {t['name']} — {t['artist']}"
+        for i, t in enumerate(tiktok_tracks[:3])
+    ]
 
-## 🔥 TikTok Viral Alert
-{tiktoks}
+    return {
+        "overview": overview,
+        "top_charts": "Top thịnh hành toàn cầu hôm nay:\n" + "\n".join(top_charts_lines),
+        "tiktok": "Đang lan truyền trên TikTok:\n" + "\n".join(tiktok_lines),
+        "community": (
+            f"Sentiment cộng đồng Reddit r/Music 24h: {sent_label} "
+            f"({sentiment.get('total', 0)} bài).\n"
+            f"Bài nổi bật nhất: {hot_reddit}"
+        ),
+        "forecast": (
+            "AI Insight sẽ được kích hoạt trở lại vào ngày mai. "
+            "Theo dõi mục Trending để cập nhật chi tiết."
+        ),
+    }
 
-## 💬 Cộng đồng Reddit r/Music
-Sentiment 24h: **{sent_label}** · {sentiment.get('total', 0)} posts
-Hot nhất: *{hot_reddit}*
 
-## 🎯 Ghi chú
-Dữ liệu tổng hợp tự động từ Last.fm · Deezer · Reddit. AI Insight sẽ được kích hoạt trở lại vào ngày mai."""
+def _briefing_dict_to_text(b: dict) -> str:
+    """Convert structured briefing dict thành 1 chuỗi plain text (cho compat)."""
+    return (
+        f"{b.get('overview', '').strip()}\n\n"
+        f"Tổng quan top chart\n{b.get('top_charts', '').strip()}\n\n"
+        f"TikTok viral\n{b.get('tiktok', '').strip()}\n\n"
+        f"Cộng đồng nói gì\n{b.get('community', '').strip()}\n\n"
+        f"Dự báo tuần tới\n{b.get('forecast', '').strip()}"
+    ).strip()
 
 
 async def _generate_briefing_with_gemini(
@@ -62,66 +84,89 @@ async def _generate_briefing_with_gemini(
     tiktok_tracks: list,
     reddit_posts:  list,
     sentiment:     dict,
-) -> str:
-    """Gọi Gemini để sinh Daily Music Briefing."""
+) -> dict | None:
+    """Gọi Gemini để sinh Daily Music Briefing dạng structured JSON.
+
+    Trả về dict {overview, top_charts, tiktok, community, forecast} hoặc None nếu lỗi.
+    """
+    import json
+    from app.ai.gemini_service import _call_gemini  # type: ignore
 
     lf_str = "\n".join([
-        f"  {i+1}. {t['name']} — {t['artist']} ({int(t.get('playcount', 0)):,} plays)"
+        f"{i+1}. {t['name']} — {t['artist']} ({int(t.get('playcount', 0)):,} plays)"
         for i, t in enumerate(lastfm_tracks[:5])
     ])
     tk_str = "\n".join([
-        f"  {i+1}. {t['name']} — {t['artist']}"
+        f"{i+1}. {t['name']} — {t['artist']}"
         for i, t in enumerate(tiktok_tracks[:5])
     ])
     reddit_str = "\n".join([
-        f"  - {p['title'][:80]} (⬆️ {p['score']:,})"
+        f"- {p['title'][:80]} (upvote: {p['score']:,})"
         for p in reddit_posts[:5]
     ])
     sentiment_label = (
-        "rất tích cực 😊" if sentiment.get("compound", 0) > 0.3 else
-        "tích cực 🙂"    if sentiment.get("compound", 0) > 0.05 else
-        "trung tính 😐"  if sentiment.get("compound", 0) > -0.05 else
-        "tiêu cực 😠"
+        "rất tích cực" if sentiment.get("compound", 0) > 0.3 else
+        "tích cực"    if sentiment.get("compound", 0) > 0.05 else
+        "trung tính"  if sentiment.get("compound", 0) > -0.05 else
+        "tiêu cực"
     )
 
-    prompt = f"""Bạn là biên tập viên âm nhạc chuyên nghiệp của tờ báo âm nhạc hàng đầu châu Á.
+    prompt = f"""Bạn là biên tập viên âm nhạc chuyên nghiệp viết cho dashboard số.
 Hôm nay là {date.today().strftime('%d/%m/%Y')}.
 
-Dữ liệu thực tế hôm nay:
+Dữ liệu thực tế:
 
-📊 TOP LAST.FM GLOBAL:
+TOP LAST.FM GLOBAL:
 {lf_str}
 
-🎵 ĐANG VIRAL TIKTOK:
+ĐANG VIRAL TIKTOK:
 {tk_str}
 
-💬 REDDIT r/Music HOT POSTS (24h):
+REDDIT r/Music HOT POSTS (24h):
 {reddit_str}
-→ Sentiment cộng đồng: {sentiment_label} (score: {sentiment.get('compound', 0):.2f})
-→ Mentions: {sentiment.get('total', 0)} posts phân tích
+Sentiment cộng đồng: {sentiment_label} (score: {sentiment.get('compound', 0):.2f}, {sentiment.get('total', 0)} posts)
 
----
-Viết **Daily Music Intelligence Briefing** (tiếng Việt, 200-250 từ) theo cấu trúc:
+Trả về một JSON object với 5 trường, mỗi trường là plain text tiếng Việt (KHÔNG dùng markdown, KHÔNG dùng ## hay **):
+{{
+  "overview": "1-2 câu tóm tắt tình hình âm nhạc toàn cầu hôm nay",
+  "top_charts": "Phân tích top 3 bài hát nổi bật nhất, tại sao chúng dẫn đầu (3-4 câu)",
+  "tiktok": "Bài nào đang làm mưa làm gió TikTok và dự đoán có lên chart không (3-4 câu)",
+  "community": "Tóm tắt tâm lý cộng đồng Reddit, chủ đề đang hot (3-4 câu)",
+  "forecast": "1-2 bài có khả năng bứt phá tuần tới và lý do cụ thể (3-4 câu)"
+}}
 
-## 🌅 Tổng quan ngày {date.today().strftime('%d/%m/%Y')}
-(1-2 câu tóm tắt tình hình âm nhạc toàn cầu hôm nay)
+Chỉ trả về JSON, không ký hiệu markdown, không text giải thích thêm. Tổng độ dài 200-280 từ."""
 
-## 📊 Top Charts
-(Phân tích top 3 bài hát nổi bật nhất — tại sao chúng đang dẫn đầu?)
+    cache_key = f"{date.today()}:daily_briefing_json"
+    from app.ai.gemini_service import _insight_cache  # type: ignore
+    if cache_key in _insight_cache:
+        try:
+            return json.loads(_insight_cache[cache_key])
+        except Exception:
+            pass
 
-## 🔥 TikTok Viral Alert  
-(Bài nào đang làm mưa làm gió TikTok? Dự đoán chúng có lên chart không?)
+    raw = await _call_gemini(prompt, max_tokens=900)
+    if raw.startswith("⚠️"):
+        return None
 
-## 💬 Cộng đồng nói gì?
-(Tóm tắt tâm lý người nghe từ Reddit — chủ đề nào đang hot?)
+    # Bóc JSON từ response (Gemini đôi khi wrap bằng ```json ... ```)
+    cleaned = raw.strip()
+    if cleaned.startswith("```"):
+        cleaned = cleaned.split("```", 2)[1]
+        if cleaned.startswith("json"):
+            cleaned = cleaned[4:]
+        cleaned = cleaned.strip().rstrip("`").strip()
 
-## 🎯 Dự báo tuần tới
-(1-2 bài có khả năng bứt phá nhất — lý do cụ thể)
-
-Viết như một biên tập viên thực thụ: súc tích, có insight, không liệt kê khô khan."""
-
-    # Dùng cache_key = "daily_briefing" để Gemini chỉ gọi 1 lần/ngày
-    return await analyze_country_insight(prompt, cache_key="daily_briefing")
+    try:
+        parsed = json.loads(cleaned)
+        if not isinstance(parsed, dict):
+            return None
+        # Cache JSON dạng string
+        _insight_cache[cache_key] = json.dumps(parsed, ensure_ascii=False)
+        return parsed
+    except Exception as e:
+        print(f"⚠️ Gemini briefing JSON parse fail: {e}")
+        return None
 
 
 @router.get("/daily")
@@ -150,15 +195,20 @@ async def get_daily_briefing(force_refresh: bool = Query(False)):
 
     sentiment = analyze_posts_sentiment(reddit_posts) if reddit_posts else {}
 
-    # Gọi Gemini — nếu lỗi 429 thì dùng fallback (không retry để tiết kiệm quota)
-    briefing_text = await _generate_briefing_with_gemini(
+    # Gọi Gemini — nếu lỗi/quota thì dùng fallback structured
+    briefing_struct = await _generate_briefing_with_gemini(
         lf_tracks, tiktok_tracks, reddit_posts, sentiment
     )
-    if briefing_text.startswith("⚠️"):
-        briefing_text = _fallback_briefing(lf_tracks, tiktok_tracks, reddit_posts, sentiment)
+    if not briefing_struct:
+        briefing_struct = _fallback_briefing(lf_tracks, tiktok_tracks, reddit_posts, sentiment)
+
+    # Bảo đảm mọi field plain text, strip markdown nếu Gemini lỡ output
+    from app.ai.text_clean import strip_markdown
+    briefing_struct = {k: strip_markdown(v) for k, v in briefing_struct.items()}
 
     result = {
-        "briefing":         briefing_text,
+        "briefing_sections": briefing_struct,
+        "briefing":         _briefing_dict_to_text(briefing_struct),  # backward-compat
         "date":             today,
         "generated_at":     datetime.now().isoformat(),
         "top_tracks_used":  lf_tracks[:5],

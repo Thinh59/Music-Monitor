@@ -5,10 +5,11 @@ Prediction Router
 - /              : predict thủ công với features đầy đủ
 """
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, HTTPException
 from pydantic import BaseModel
+from datetime import datetime, timezone
 from app.ai.hit_prediction import predict_hit_probability
-from app.services.deezer   import get_tiktok_viral, get_global_chart, search_track, get_special_playlist
+from app.services.deezer   import get_tiktok_viral, get_global_chart, search_track, get_special_playlist, search_artist
 from app.services.lastfm   import get_global_top_tracks, get_artist_tags
 from app.services.youtube  import search_music_video, get_video_stats
 from app.services.reddit   import search_artist_mentions, count_mentions_24h
@@ -33,6 +34,14 @@ class PredictionRequest(BaseModel):
 class QuickPredictionRequest(BaseModel):
     track_name:  str
     artist_name: str
+
+
+@router.get("/artists/search")
+async def find_artist(q: str = Query(..., min_length=2)):
+    """API gợi ý tên nghệ sĩ khi type."""
+    from app.services.deezer import search_artist
+    results = await search_artist(q, limit=5)
+    return {"data": results}
 
 
 @router.post("/")
@@ -62,6 +71,22 @@ async def quick_predict(req: QuickPredictionRequest):
     dz_results = await search_track(req.track_name, req.artist_name, limit=1)
     dz_meta    = dz_results[0] if dz_results else {}
 
+    if not dz_meta:
+        if req.track_name and req.artist_name:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Không tìm thấy bài hát '{req.track_name}' của nghệ sĩ '{req.artist_name}'. Vui lòng kiểm tra lại!"
+            )
+        else:
+            raise HTTPException(status_code=404, detail="Không tìm thấy dữ liệu về bài hát/nghệ sĩ này.")
+
+    # Cập nhật lại tên bài hát và nghệ sĩ chuẩn xác từ Deezer (nếu user chỉ nhập thiếu context)
+    if dz_meta:
+        req.track_name  = dz_meta.get("name", req.track_name)
+        req.artist_name = dz_meta.get("artist", req.artist_name)
+        track_data["track_name"]  = req.track_name
+        track_data["artist_name"] = req.artist_name
+
     # 2. YouTube MV stats
     yt_hits = await search_music_video(
         f"{req.track_name} {req.artist_name} official music video"
@@ -69,11 +94,35 @@ async def quick_predict(req: QuickPredictionRequest):
     if yt_hits:
         stats = await get_video_stats(yt_hits[0]["video_id"])
         views = stats.get("view_count", 0)
+        
+        # Xử lý growth thực tế theo độ tuổi của MV (fix bài quá cũ như Love Shot 2018 mà vẫn nhảy hit)
+        pub_str = stats.get("published_at") or yt_hits[0].get("published_at", "")
+        decay_factor = 1.0
+        if pub_str:
+            try:
+                pub_date = datetime.fromisoformat(pub_str.replace("Z", "+00:00"))
+                if not pub_date.tzinfo:
+                    pub_date = pub_date.replace(tzinfo=timezone.utc)
+                days_old = max(1, (datetime.now(timezone.utc) - pub_date).days)
+                if days_old > 365:
+                    decay_factor = 0.02   # Rất cũ (trên 1 năm) -> % growth/ngày rất thấp
+                elif days_old > 100:
+                    decay_factor = 0.15   # Qua giai đoạn hot
+                elif days_old > 30:
+                    decay_factor = 0.5    # Ra mắt 1 tháng
+            except Exception:
+                pass
+                
+        base_growth = views / 1_000_000 * 12
+        mock_growth_24h = min(base_growth * decay_factor, 600)
+
         track_data.update({
             "youtube_video_id":  yt_hits[0]["video_id"],
             "youtube_views":     views,
             "youtube_comments":  stats.get("comment_count", 0),
-            "youtube_growth_24h": min(views / 1_000_000 * 12, 600),
+            "youtube_growth_24h": mock_growth_24h,
+            "youtube_growth_48h": mock_growth_24h * 1.8,
+            "youtube_growth_7d":  mock_growth_24h * 5.0,
             "youtube_thumbnail": yt_hits[0].get("thumbnail"),
         })
 

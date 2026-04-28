@@ -527,12 +527,17 @@ export default function Dashboard() {
         </div>
 
         {/* ── ROW 4: Spotify ── */}
-        {state.spotifyTracks.length > 0 && (
-          <div className="bg-[#1a1b1e] rounded-xl border border-gray-800 overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
-              <h2 className="text-base font-semibold text-white">🎧 Spotify — Top Tracks</h2>
-              <SourceBadge source="Spotify" sourceUrl="https://developer.spotify.com" />
+        <div data-testid="spotify-section" className="bg-[#1a1b1e] rounded-xl border border-gray-800 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
+            <h2 className="text-base font-semibold text-white">🎧 Spotify — Top Tracks</h2>
+            <SourceBadge source="Spotify" sourceUrl="https://developer.spotify.com" />
+          </div>
+          {state.spotifyTracks.length === 0 ? (
+            <div className="px-5 py-8 text-center text-gray-500 text-sm">
+              <p className="mb-1">Spotify hiện không khả dụng</p>
+              <p className="text-xs text-gray-600">Kiểm tra SPOTIFY_CLIENT_ID/SECRET trong backend .env</p>
             </div>
+          ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-0 divide-x divide-gray-800/50">
               {state.spotifyTracks.slice(0, 20).map((t, i) => (
                 <div key={i} className="px-4 py-3 hover:bg-white/5 transition-colors border-b border-gray-800/30">
@@ -555,8 +560,8 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* ── Footer ── */}
         <div className="text-xs text-gray-700 text-center pb-4">

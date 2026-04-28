@@ -91,11 +91,36 @@ export default function MapPage() {
             <SourceBadge source="Deezer" sourceUrl="https://api.deezer.com" />
             <SourceBadge source="Last.fm" sourceUrl="https://www.last.fm/api" />
             <SourceBadge source="Gemini AI" />
+            <label htmlFor="country-picker" className="sr-only">Chọn quốc gia</label>
+            <select
+              id="country-picker"
+              data-testid="country-picker"
+              value={selCountry ?? ""}
+              onChange={(e) => e.target.value && handleCountryClick(e.target.value)}
+              disabled={loading || clusters.length === 0}
+              className="text-xs bg-[#1a1b1e] text-gray-200 border border-gray-800 rounded-lg
+                         px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500
+                         disabled:opacity-50"
+            >
+              <option value="">🌍 Chọn quốc gia…</option>
+              {[...clusters]
+                .sort((a, b) => a.country.localeCompare(b.country))
+                .map((c) => (
+                  <option key={c.iso_code} value={c.iso_code}>
+                    {c.country.split(" ").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")} ({c.iso_code})
+                  </option>
+                ))}
+            </select>
             <button
               onClick={async () => {
                 if (!confirm("Xoá cache và cào lại (60-90s)?")) return;
-                await fetch(`${BASE}/api/map/clusters/cache`, { method: "DELETE" });
-                window.location.reload();
+                try {
+                  const res = await fetch(`${BASE}/api/map/clusters/cache`, { method: "DELETE" });
+                  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                  window.location.reload();
+                } catch (e) {
+                  alert(`Không xoá được cache. Backend có đang chạy không?\n\n${e instanceof Error ? e.message : e}`);
+                }
               }}
               className="text-xs text-gray-600 hover:text-gray-400 underline"
             >

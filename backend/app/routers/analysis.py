@@ -201,22 +201,15 @@ DỮ LIỆU HÔM NAY ({__import__('datetime').date.today().strftime('%d/%m/%Y')}
 Top Charts (Last.fm): {chart_str}
 TikTok Viral (Deezer): {tiktok_str}
 
-Hãy viết **Market Intelligence Summary** (tiếng Việt, 250 từ) với:
+Viết Market Intelligence Summary (tiếng Việt, ~250 từ) thành 5 đoạn liên tiếp, mỗi đoạn 2-3 câu, mỗi đoạn bắt đầu bằng nhãn ngắn rồi hai chấm:
 
-## 🎯 Key Insight #1: Xu hướng nổi bật nhất
-(Pattern gì đáng chú ý trong dữ liệu hôm nay?)
+Insight 1: Xu hướng nổi bật nhất hôm nay (pattern đáng chú ý).
+Insight 2: Sự dịch chuyển thể loại (genre nào lên, genre nào xuống).
+Insight 3: TikTok vs Charts gap (bài viral TikTok nhưng chưa vào chart).
+Dự đoán: 1-2 bài/nghệ sĩ có khả năng bứt phá tuần tới và lý do cụ thể.
+Khuyến nghị: nhà sản xuất hoặc marketing nên làm gì tuần này.
 
-## 🎯 Key Insight #2: Sự dịch chuyển thể loại
-(Genre nào đang lên? Genre nào đang xuống?)
-
-## 🎯 Key Insight #3: TikTok vs Charts Gap
-(Bài nào đang viral TikTok nhưng chưa vào chart? Đây là hit tiềm năng?)
-
-## 📈 Dự đoán 7 ngày tới
-(Cụ thể 1-2 bài/nghệ sĩ có khả năng bứt phá nhất và lý do)
-
-## 💡 Khuyến nghị thực tế
-(Nhà sản xuất/marketing nên làm gì ngay tuần này?)"""
+QUAN TRỌNG: Plain text thuần, không markdown, không ## hay **, không dùng dấu sao làm bullet."""
 
     insight = await analyze_country_insight(prompt, cache_key="market_summary")
     return {

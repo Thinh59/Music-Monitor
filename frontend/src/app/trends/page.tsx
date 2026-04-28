@@ -74,10 +74,7 @@ export default function TrendsPage() {
     setAiInsight("");
     setLoadAi(true);
     try {
-      const res = await fetch(`${BASE}/api/map/country/US/ai-insight`);
-      // Dùng endpoint country insight với prompt custom
-      // Thực tế: gọi endpoint riêng nếu muốn prompt về post
-      // Tạm thời dùng mock insight nếu chưa có endpoint riêng
+      const res = await fetch(`${BASE}/api/trends/reddit-insight?title=${encodeURIComponent(post.title)}&subreddit=${encodeURIComponent(post.subreddit)}`);
       const data = await res.json();
       setAiInsight(data.insight ?? "");
     } catch {

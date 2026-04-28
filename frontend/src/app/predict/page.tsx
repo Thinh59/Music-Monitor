@@ -48,12 +48,33 @@ export default function PredictPage() {
   const [candLoad,   setCandLoad]= useState(true);
   const [error,      setError]   = useState<string | null>(null);
   const [playing,    setPlaying] = useState<string | null>(null);  // preview audio
+  
+  // State gợi ý nghệ sĩ
+  const [artistSuggestions, setArtistSuggestions] = useState<Array<{id: number, name: string}>>([]);
 
   useEffect(() => { loadCandidates(); }, []);
 
+  // Fetch debounce cho gợi ý nghệ sĩ
+  useEffect(() => {
+    if (!artistName || artistName.length < 2) {
+      setArtistSuggestions([]);
+      return;
+    }
+    const delay = setTimeout(async () => {
+      try {
+        const res = await fetch(`${BASE}/api/prediction/artists/search?q=${encodeURIComponent(artistName)}`);
+        const data = await res.json();
+        if (data && data.data) setArtistSuggestions(data.data);
+      } catch (e) {
+        // Bỏ qua lỗi debounce này
+      }
+    }, 300);
+    return () => clearTimeout(delay);
+  }, [artistName]);
+
   // ── Predict bài hát cụ thể ──────────────────────────────────────────────
   async function handlePredict() {
-    if (!trackName || !artistName) return;
+    if (!trackName && !artistName) return;
     setLoading(true);
     setError(null);
     setResult(null);
@@ -63,19 +84,47 @@ export default function PredictPage() {
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({ track_name: trackName, artist_name: artistName }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setResult(await res.json());
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.detail || `Lỗi từ máy chủ (${res.status})`);
+      }
+      
+      const responseData = await res.json();
+      setResult(responseData);
+
+      // Cập nhật kết quả tìm kiếm vào BXH để người dùng dễ theo dõi
+      setCands((prev) => {
+        const exists = prev.some(c => c.name === responseData.track && c.artist === responseData.artist);
+        if (exists) return prev;
+
+        const newCand: Candidate = {
+          name: responseData.track,
+          artist: responseData.artist,
+          image: responseData.metadata?.image,
+          preview: responseData.metadata?.preview,
+          hit_probability: responseData.hit_probability,
+          prediction: responseData.prediction,
+          confidence: responseData.confidence,
+          source: "Người dùng tìm kiếm 🔍",
+        };
+        const newList = [...prev, newCand];
+        // Sort giảm dần theo hit_probability
+        return newList.sort((a, b) => b.hit_probability - a.hit_probability);
+      });
+
     } catch (e: any) {
       setError(e.message);
-      // Fallback UI khi backend lỗi
-      setResult({
-        track:           trackName,
-        artist:          artistName,
-        hit_probability: Math.round(50 + Math.random() * 35),
-        prediction:      "Watch",
-        confidence:      "Low",
-        is_fallback:     true,
-      });
+      // Chỉ hiện fallback UI nếu là các lỗi hệ thống không kiểm soát (chứ không phải 404 validation)
+      if (!e.message.includes("Không tìm thấy")) {
+        setResult({
+          track:           trackName,
+          artist:          artistName || "Unknown Artist",
+          hit_probability: Math.round(50 + Math.random() * 35),
+          prediction:      "Watch",
+          confidence:      "Low",
+          is_fallback:     true,
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -142,23 +191,29 @@ export default function PredictPage() {
           <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
-              placeholder="Tên bài hát..."
+              placeholder="Tên bài hát / Từ khóa..."
               value={trackName}
               onChange={(e) => setTrack(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handlePredict()}
+              onKeyDown={(e) => e.key === "Enter" && (!trackName && !artistName ? undefined : handlePredict())}
               className="flex-1 bg-[#121212] border border-gray-700 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition"
             />
             <input
               type="text"
-              placeholder="Nghệ sĩ..."
+              placeholder="Nghệ sĩ (Tùy chọn)..."
               value={artistName}
+              list="artist-suggestions"
               onChange={(e) => setArtist(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handlePredict()}
+              onKeyDown={(e) => e.key === "Enter" && (!trackName && !artistName ? undefined : handlePredict())}
               className="flex-1 bg-[#121212] border border-gray-700 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition"
             />
+            <datalist id="artist-suggestions">
+              {artistSuggestions.map((a) => (
+                <option key={a.id} value={a.name} />
+              ))}
+            </datalist>
             <button
               onClick={handlePredict}
-              disabled={loading || !trackName || !artistName}
+              disabled={loading || (!trackName && !artistName)}
               className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-600
                          text-white px-8 py-2.5 rounded-lg text-sm font-medium transition-colors"
             >

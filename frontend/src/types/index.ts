@@ -38,13 +38,24 @@ export interface ClusterCountry {
   pca_y: number;
 }
 
+export interface BriefingSections {
+  overview: string;
+  top_charts: string;
+  tiktok: string;
+  community: string;
+  forecast: string;
+}
+
 export interface DailyBriefing {
   briefing: string;
+  briefing_sections?: BriefingSections;
   date: string;
   generated_at: string;
   sources: string[];
   source_urls: string[];
   top_tracks_used: Track[];
+  tiktok_used?: Track[];
+  reddit_sentiment?: SentimentResult;
   cached: boolean;
 }
 

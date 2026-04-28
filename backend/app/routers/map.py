@@ -7,7 +7,7 @@ Map Router — World Music Taste Map
 - Cache file-based tránh gọi API 110 lần mỗi lần F5
 """
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query
 import json, os, asyncio
 
 from app.services.lastfm  import get_artist_tags, get_top_tracks_by_country
@@ -174,8 +174,10 @@ async def get_country_top(iso_code: str, limit: int = Query(20, le=50)):
     Top bài hát tại 1 quốc gia.
     Nguồn ưu tiên: Deezer Chart → fallback Last.fm
     """
-    iso    = iso_code.upper()
-    name   = COUNTRY_MAP.get(iso, "")
+    iso  = iso_code.upper()
+    if iso not in COUNTRY_MAP:
+        raise HTTPException(status_code=404, detail=f"Unknown country code: {iso}")
+    name = COUNTRY_MAP[iso]
 
     tracks: list[dict] = []
 
@@ -183,7 +185,7 @@ async def get_country_top(iso_code: str, limit: int = Query(20, le=50)):
     dz = await get_country_chart(iso, limit=limit)
     if dz:
         tracks = dz
-    elif name:
+    else:
         # Fallback: Last.fm
         try:
             lf = await get_top_tracks_by_country(name, limit=limit)
@@ -207,8 +209,10 @@ async def get_country_ai_insight(iso_code: str):
     Gemini AI phân tích gu âm nhạc của 1 quốc gia.
     Gọi khi user click vào marker trên bản đồ.
     """
-    iso  = iso_code.upper()
-    name = COUNTRY_MAP.get(iso, iso)
+    iso = iso_code.upper()
+    if iso not in COUNTRY_MAP:
+        raise HTTPException(status_code=404, detail=f"Unknown country code: {iso}")
+    name = COUNTRY_MAP[iso]
 
     # Lấy top 10 bài hát thật
     tracks = await get_country_chart(iso, limit=10)
@@ -226,13 +230,13 @@ async def get_country_ai_insight(iso_code: str):
 Dưới đây là 8 bài hát đang TOP tại {name.title()} ({iso}) hôm nay:
 {track_list}
 
-Hãy viết báo cáo phân tích NGẮN GỌN (150-200 từ, tiếng Việt) theo cấu trúc:
-**🎵 Bức tranh âm nhạc:** (Gu âm nhạc hiện tại của {name.title()} là gì? Pop, hiphop, indie, hay địa phương?)
-**🔥 Lý do viral:** (Vì sao những bài này đang hot? TikTok? Phim? Collab?)  
-**🌐 Xu hướng:** (Xu hướng này phản ánh văn hóa địa phương hay ảnh hưởng toàn cầu?)
-**📈 Dự báo:** (Gu âm nhạc sẽ thay đổi theo hướng nào trong tháng tới?)
+Viết báo cáo NGẮN GỌN (150-200 từ, tiếng Việt) gồm 4 đoạn liên tiếp, mỗi đoạn 2-3 câu:
+1. Bức tranh âm nhạc — gu âm nhạc hiện tại của {name.title()} (Pop, hiphop, indie, hay địa phương).
+2. Lý do viral — vì sao những bài này đang hot (TikTok, phim, collab).
+3. Xu hướng — phản ánh văn hóa địa phương hay ảnh hưởng toàn cầu.
+4. Dự báo — gu sẽ thay đổi theo hướng nào trong tháng tới.
 
-Viết súc tích, chuyên nghiệp, dùng markdown."""
+QUAN TRỌNG: Trả về plain text thuần. Không dùng markdown, không dùng ## hay **, không dùng bullet ngôi sao."""
 
     insight = await analyze_country_insight(prompt, cache_key=f"country_insight_{iso}")
 

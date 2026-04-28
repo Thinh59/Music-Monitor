@@ -216,10 +216,29 @@ async def get_global_chart(limit: int = 50) -> list[dict]:
 
 # ── Search & Metadata ─────────────────────────────────────────────────────────
 
+async def search_artist(query: str, limit: int = 5) -> list[dict]:
+    """Tìm gợi ý nghệ sĩ trên Deezer."""
+    data = await _get(f"{BASE}/search/artist", {"q": query, "limit": limit})
+    return [{"id": a["id"], "name": a["name"], "picture": a.get("picture_small")} 
+            for a in data.get("data", [])]
+
 async def search_track(track_name: str, artist_name: str = "", limit: int = 5) -> list[dict]:
-    """Tìm bài hát trên Deezer."""
-    q    = f'track:"{track_name}"' + (f' artist:"{artist_name}"' if artist_name else "")
+    """Tìm bài hát trên Deezer hỗ trợ free-text hoặc advance search."""
+    # Nếu chỉ có 1 field, ném thẳng vào q để tìm kiếm linh hoạt
+    if not track_name and artist_name:
+        q = artist_name
+    elif track_name and not artist_name:
+        q = track_name
+    else:
+        q = f'track:"{track_name}" artist:"{artist_name}"'
+        
     data = await _get(f"{BASE}/search", {"q": q, "limit": limit})
+    
+    # Fallback cho trường hợp search chính xác không tìm thấy bài hát (vd: gõ "Reverxe" thay vì "Reverse", hoặc bài hát tiếng Hàn bị việt hoá)
+    if not data.get("data") and track_name and artist_name:
+        fallback_q = f"{track_name} {artist_name}"
+        data = await _get(f"{BASE}/search", {"q": fallback_q, "limit": limit})
+
     return [_format_track(t, source="Deezer Search") for t in data.get("data", [])]
 
 

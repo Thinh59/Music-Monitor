@@ -12,11 +12,11 @@ import asyncio
 
 from app.services.youtube   import search_music_video, get_video_stats
 from app.services.reddit    import get_trending_music_posts, search_artist_mentions, count_mentions_24h
-from app.services.lastfm    import get_global_top_tracks
+from app.services.lastfm    import get_global_top_tracks, get_artist_tags
 from app.services.deezer    import get_tiktok_viral, get_special_playlist, get_global_chart
 from app.ai.trend_detection import detect_view_spike_zscore, calculate_viral_score
 from app.ai.sentiment       import analyze_posts_sentiment
-from app.ai.gemini_service  import analyze_country_insight   # dùng lại cho trend insight
+from app.ai.gemini_service  import analyze_country_insight, explain_trend   # NLP trend explanation
 
 router = APIRouter()
 
@@ -182,6 +182,77 @@ async def get_viral_score(track_name: str, artist: str = Query("")):
         "reddit_mentions": mentions_24h,
         "sentiment":       sentiment,
         "sources":         ["YouTube Data API v3", "Reddit API", "VADER"],
+    }
+
+
+@router.get("/explain/{track_name}")
+async def explain_viral_trend(track_name: str, artist: str = Query("")):
+    """
+    Giải thích bằng NLP (Gemini) tại sao 1 bài hát đang viral.
+    Tự động thu thập:
+      - Reddit mentions 24h + sentiment + top post
+      - YouTube view growth (proxy từ view count, fallback 0 khi quota hết)
+      - Genre tag từ Last.fm artist.getTopTags
+    Sau đó gọi explain_trend() → giải thích 2-3 câu tiếng Việt.
+    Cache theo ngày trong gemini_service (1 lần Gemini / track / ngày).
+    """
+    query = f"{track_name} {artist}".strip()
+
+    # 1. Reddit + sentiment + top post (parallel với YouTube + genre)
+    reddit_task = search_artist_mentions(query, limit=30)
+    yt_task     = search_music_video(f"{query} official music video")
+    genre_task  = get_artist_tags(artist) if artist else asyncio.sleep(0, result=[])
+
+    reddit_posts, yt_hits, genre_tags = await asyncio.gather(
+        reddit_task, yt_task, genre_task, return_exceptions=True,
+    )
+    if isinstance(reddit_posts, Exception): reddit_posts = []
+    if isinstance(yt_hits,      Exception): yt_hits      = []
+    if isinstance(genre_tags,   Exception): genre_tags   = []
+
+    mentions_24h = count_mentions_24h(reddit_posts)
+    sentiment    = analyze_posts_sentiment(reddit_posts)
+    top_post     = reddit_posts[0]["title"] if reddit_posts else ""
+
+    # 2. YouTube growth proxy (view count → growth %)
+    yt_views = 0
+    video_id = ""
+    if yt_hits:
+        video_id = yt_hits[0].get("video_id", "")
+        stats    = await get_video_stats(video_id) if video_id else {}
+        yt_views = stats.get("view_count", 0)
+    yt_growth_pct = min(yt_views / 1_000_000 * 15, 500.0) if yt_views else 0.0
+
+    # 3. Genre tag chủ đạo
+    genre = (genre_tags[0] if genre_tags else "") if isinstance(genre_tags, list) else ""
+
+    # 4. Gọi Gemini NLP
+    explanation = await explain_trend(
+        track_name=track_name,
+        artist=artist,
+        youtube_growth_pct=yt_growth_pct,
+        reddit_mentions=mentions_24h,
+        sentiment_score=sentiment.get("compound", 0.0),
+        top_reddit_post=top_post,
+        genre=genre,
+    )
+
+    return {
+        "track_name":  track_name,
+        "artist":      artist,
+        "explanation": explanation,
+        "data_used": {
+            "youtube_views":      yt_views,
+            "youtube_growth_pct": round(yt_growth_pct, 2),
+            "reddit_mentions_24h": mentions_24h,
+            "sentiment":          sentiment,
+            "top_reddit_post":    top_post[:120],
+            "genre":              genre,
+            "video_id":           video_id,
+        },
+        "sources":    ["Reddit Public API + VADER", "YouTube Data API v3",
+                       "Last.fm artist.getTopTags", "Gemini 3.1 Flash-Lite"],
+        "source_url": "https://ai.google.dev",
     }
 
 

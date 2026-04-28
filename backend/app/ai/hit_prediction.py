@@ -4,7 +4,21 @@ import joblib
 import os
 from datetime import datetime
 
-MODEL_PATH = "models/hit_predictor.joblib"
+# Absolute path: backend/app/ai/ → backend/app/models/hit_predictor.joblib
+MODEL_PATH = os.path.normpath(
+    os.path.join(os.path.dirname(__file__), "..", "models", "hit_predictor.joblib")
+)
+
+# Lazy-load model 1 lần duy nhất khi server boot (không reload mỗi request)
+_model = None
+if os.path.exists(MODEL_PATH):
+    try:
+        _model = joblib.load(MODEL_PATH)
+        print(f"✅ Hit predictor loaded: {MODEL_PATH}")
+    except Exception as e:
+        print(f"⚠️ Hit predictor failed to load ({e}) → dùng heuristic fallback")
+else:
+    print(f"⚠️ Model file không tồn tại tại {MODEL_PATH} → dùng heuristic fallback")
 
 def build_features(track_data: dict) -> np.ndarray:
     """
@@ -29,20 +43,22 @@ def build_features(track_data: dict) -> np.ndarray:
 def predict_hit_probability(track_data: dict) -> dict:
     """Dự đoán xác suất bài hát lọt top chart trong 7 ngày."""
     features = build_features(track_data)
-    
-    if os.path.exists(MODEL_PATH):
-        model = joblib.load(MODEL_PATH)
-        prob = float(model.predict_proba(features)[0][1])
+
+    if _model is not None:
+        prob = float(_model.predict_proba(features)[0][1])
+        model_used = "XGBoost"
     else:
         # Heuristic fallback nếu chưa có model train
         growth = track_data.get("youtube_growth_24h", 0)
         mentions = track_data.get("reddit_mentions_24h", 0)
         prob = min((growth / 1000 * 0.6 + mentions / 200 * 0.4), 0.99)
-    
+        model_used = "Heuristic"
+
     return {
         "hit_probability": round(prob * 100, 1),
         "prediction": "Potential Hit" if prob > 0.6 else "Watch" if prob > 0.3 else "Normal",
-        "confidence": "High" if prob > 0.8 else "Medium" if prob > 0.5 else "Low"
+        "confidence": "High" if prob > 0.8 else "Medium" if prob > 0.5 else "Low",
+        "model_used": model_used,
     }
 
 def train_model(X: np.ndarray, y: np.ndarray):

@@ -12,9 +12,14 @@ import {
   Database,
   Sparkles,
 } from "lucide-react";
-import SourceBadge from "./SourceBadge";
 import type { DailyBriefing, BriefingSections } from "@/types";
 import { cleanText } from "@/lib/cleanText";
+import {
+  parseSectionText,
+  tokenizeInline,
+  type InlineToken,
+  type SectionBlock,
+} from "@/lib/parseSection";
 
 interface BriefingCardProps {
   briefing: DailyBriefing;
@@ -26,16 +31,16 @@ const SECTIONS: {
   key: keyof BriefingSections;
   label: string;
   Icon: typeof Sunrise;
+  hue: string;
 }[] = [
-  { key: "overview", label: "Tổng quan hôm nay", Icon: Sunrise },
-  { key: "top_charts", label: "Top Charts", Icon: BarChart3 },
-  { key: "tiktok", label: "TikTok Viral Alert", Icon: Flame },
-  { key: "community", label: "Cộng đồng nói gì", Icon: MessageCircle },
-  { key: "forecast", label: "Dự báo tuần tới", Icon: Target },
+  { key: "overview", label: "Tổng quan hôm nay", Icon: Sunrise, hue: "from-amber-500/15 to-pink-500/10" },
+  { key: "top_charts", label: "Top Charts", Icon: BarChart3, hue: "from-purple-500/15 to-blue-500/10" },
+  { key: "tiktok", label: "TikTok Viral Alert", Icon: Flame, hue: "from-fuchsia-500/15 to-rose-500/10" },
+  { key: "community", label: "Cộng đồng nói gì", Icon: MessageCircle, hue: "from-blue-500/15 to-cyan-500/10" },
+  { key: "forecast", label: "Dự báo tuần tới", Icon: Target, hue: "from-emerald-500/15 to-teal-500/10" },
 ];
 
 function fallbackSections(text: string): BriefingSections {
-  // Nếu backend cũ chỉ trả `briefing` text → đặt vào overview
   return {
     overview: cleanText(text),
     top_charts: "",
@@ -45,6 +50,78 @@ function fallbackSections(text: string): BriefingSections {
   };
 }
 
+function renderInline(text: string) {
+  const tokens = tokenizeInline(text);
+  return tokens.map((t: InlineToken, i) => {
+    if (t.kind === "quote") {
+      return (
+        <mark
+          key={i}
+          className="text-accent-purple bg-accent-purple/10 px-1.5 py-0.5 rounded font-medium"
+        >
+          {t.value}
+        </mark>
+      );
+    }
+    if (t.kind === "num") {
+      return (
+        <span key={i} className="font-mono text-accent-cyan font-semibold">
+          {t.value}
+        </span>
+      );
+    }
+    return <span key={i}>{t.value}</span>;
+  });
+}
+
+function renderBlock(block: SectionBlock, idx: number) {
+  if (block.kind === "lead") {
+    return (
+      <p
+        key={idx}
+        className="text-base leading-relaxed font-medium text-text-primary"
+      >
+        {renderInline(block.text)}
+      </p>
+    );
+  }
+  if (block.kind === "para") {
+    return (
+      <p
+        key={idx}
+        className="text-sm leading-relaxed text-text-secondary"
+      >
+        {renderInline(block.text)}
+      </p>
+    );
+  }
+  // list
+  return (
+    <ol key={idx} className="space-y-1.5">
+      {block.items.map((item, i) => (
+        <li
+          key={i}
+          className="flex items-start gap-3 rounded-lg bg-bg-elevated/60 border border-border-subtle px-3 py-2"
+        >
+          <span className="flex-shrink-0 h-7 w-7 rounded-md bg-gradient-aurora flex items-center justify-center text-white text-xs font-bold shadow-sm">
+            {item.rank}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-text-primary truncate">
+              {renderInline(item.primary)}
+            </p>
+            {item.secondary && (
+              <p className="text-xs text-text-muted truncate">
+                {renderInline(item.secondary)}
+              </p>
+            )}
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 export default function BriefingCard({ briefing, onRefresh, loading }: BriefingCardProps) {
   const date = new Date(briefing.generated_at).toLocaleString("vi-VN");
   const sections =
@@ -52,7 +129,6 @@ export default function BriefingCard({ briefing, onRefresh, loading }: BriefingC
 
   return (
     <div className="relative rounded-2xl bg-bg-card border border-border overflow-hidden shadow-card">
-      {/* Aurora glow */}
       <div className="absolute inset-x-0 top-0 h-1 bg-gradient-aurora" />
       <div className="absolute -top-32 -right-24 w-72 h-72 bg-accent-purple/20 rounded-full blur-3xl pointer-events-none" />
 
@@ -100,23 +176,28 @@ export default function BriefingCard({ briefing, onRefresh, loading }: BriefingC
         </div>
 
         {/* Sections */}
-        <div className="space-y-5">
-          {SECTIONS.map(({ key, label, Icon }) => {
+        <div className="space-y-4">
+          {SECTIONS.map(({ key, label, Icon, hue }) => {
             const content = cleanText(sections[key]);
             if (!content) return null;
+            const blocks = parseSectionText(content);
+
             return (
-              <section key={key} className="group">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="h-7 w-7 rounded-lg bg-gradient-card border border-accent-purple/20 flex items-center justify-center">
+              <section
+                key={key}
+                className={`relative rounded-xl border border-border-subtle bg-gradient-to-br ${hue} p-4`}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-bg-card border border-border px-2.5 py-1">
                     <Icon className="h-3.5 w-3.5 text-accent-purple" />
-                  </div>
-                  <h3 className="text-sm font-semibold text-text-primary">
-                    {label}
-                  </h3>
+                    <span className="text-[11px] font-semibold uppercase tracking-wide text-text-secondary">
+                      {label}
+                    </span>
+                  </span>
                 </div>
-                <p className="text-sm leading-relaxed text-text-secondary whitespace-pre-line pl-9">
-                  {content}
-                </p>
+                <div className="space-y-3">
+                  {blocks.map((b, i) => renderBlock(b, i))}
+                </div>
               </section>
             );
           })}

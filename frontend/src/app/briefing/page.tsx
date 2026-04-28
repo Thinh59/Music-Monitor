@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { Newspaper, Loader2, RefreshCw } from "lucide-react";
 import BriefingCard from "@/components/BriefingCard";
 import KpiCardGrid from "@/components/charts/KpiCardGrid";
@@ -10,77 +10,75 @@ import SentimentGauge from "@/components/charts/SentimentGauge";
 import GrowthArea from "@/components/charts/GrowthArea";
 import ViralHeatmap from "@/components/charts/ViralHeatmap";
 import PredictionRadar from "@/components/charts/PredictionRadar";
-import {
-  fetchDailyBriefing,
-  fetchGlobalCharts,
-  fetchGenreDistribution,
-  fetchTrendsOverview,
-  fetchYouTubeBatch,
-  fetchTikTokTrends,
-  fetchTopCandidates,
-} from "@/lib/api";
 import type { DailyBriefing, Track } from "@/types";
 
-interface DashboardData {
-  briefing: DailyBriefing | null;
-  charts: { data: Track[] } | null;
-  genres: { distribution: Record<string, number> } | null;
-  overview: {
-    reddit?: {
-      sentiment?: { compound: number; positive_pct: number; negative_pct: number; total: number };
-      mentions_24h?: number;
+interface OverviewData {
+  reddit?: {
+    sentiment?: {
+      compound: number;
+      positive_pct: number;
+      negative_pct: number;
+      total: number;
     };
-  } | null;
-  youtube: { data: { track_name: string; artist: string; view_count: number; like_count: number; comment_count: number }[] } | null;
-  tiktok: { data: Track[] } | null;
-  candidates: { data: Track[] } | null;
+    mentions_24h?: number;
+  };
+}
+
+interface YouTubeBatch {
+  data: {
+    track_name: string;
+    artist: string;
+    view_count: number;
+    like_count: number;
+    comment_count: number;
+  }[];
 }
 
 export default function BriefingPage() {
-  const [d, setD] = useState<DashboardData>({
-    briefing: null,
-    charts: null,
-    genres: null,
-    overview: null,
-    youtube: null,
-    tiktok: null,
-    candidates: null,
-  });
-  const [loading, setLoading] = useState(true);
+  // Mỗi nguồn 1 SWR key — cache độc lập, dedupe in-flight, sống sót khi đổi tab
+  const briefingSwr = useSWR<DailyBriefing>("/api/briefing/daily");
+  const chartsSwr = useSWR<{ data: Track[] }>("/api/charts/global?limit=50");
+  const genresSwr = useSWR<{ distribution: Record<string, number> }>(
+    "/api/analysis/distribution/genre",
+  );
+  const overviewSwr = useSWR<OverviewData>("/api/trends/overview");
+  const youtubeSwr = useSWR<YouTubeBatch>("/api/trends/youtube/batch");
+  const tiktokSwr = useSWR<{ data: Track[] }>("/api/trends/tiktok");
+  const candidatesSwr = useSWR<{ data: Track[] }>(
+    "/api/prediction/top-candidates?limit=10",
+  );
 
-  async function loadAll(forceRefresh = false) {
-    setLoading(true);
-    const settle = async <T,>(p: Promise<T>): Promise<T | null> =>
-      p.catch(() => null);
+  const allSwrs = [
+    briefingSwr,
+    chartsSwr,
+    genresSwr,
+    overviewSwr,
+    youtubeSwr,
+    tiktokSwr,
+    candidatesSwr,
+  ];
+  const initialLoading = allSwrs.every((s) => !s.data && !s.error);
+  const anyValidating = allSwrs.some((s) => s.isValidating);
 
-    const [briefing, charts, genres, overview, youtube, tiktok, candidates] =
-      await Promise.all([
-        settle(fetchDailyBriefing(forceRefresh)),
-        settle(fetchGlobalCharts(50)),
-        settle(fetchGenreDistribution()),
-        settle(fetchTrendsOverview()),
-        settle(fetchYouTubeBatch()),
-        settle(fetchTikTokTrends()),
-        settle(fetchTopCandidates(10)),
-      ]);
-
-    setD({
-      briefing: briefing as DailyBriefing | null,
-      charts: charts as DashboardData["charts"],
-      genres: genres as DashboardData["genres"],
-      overview: overview as DashboardData["overview"],
-      youtube: youtube as DashboardData["youtube"],
-      tiktok: tiktok as DashboardData["tiktok"],
-      candidates: candidates as DashboardData["candidates"],
-    });
-    setLoading(false);
+  function refreshAll() {
+    // Force refetch của tất cả endpoints + bust briefing cache backend
+    briefingSwr.mutate(
+      fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"}/api/briefing/daily?force_refresh=true`,
+      ).then((r) => r.json()),
+      { revalidate: false },
+    );
+    chartsSwr.mutate();
+    genresSwr.mutate();
+    overviewSwr.mutate();
+    youtubeSwr.mutate();
+    tiktokSwr.mutate();
+    candidatesSwr.mutate();
   }
 
-  useEffect(() => {
-    loadAll();
-  }, []);
-
-  const sentiment = d.overview?.reddit?.sentiment;
+  const sentiment = overviewSwr.data?.reddit?.sentiment;
+  const briefing = briefingSwr.data;
+  const tiktokData = tiktokSwr.data?.data ?? [];
 
   return (
     <main className="min-h-screen p-6 md:p-8">
@@ -93,8 +91,7 @@ export default function BriefingPage() {
             </div>
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-text-primary">
-                Daily Music{" "}
-                <span className="gradient-text">Briefing</span>
+                Daily Music <span className="gradient-text">Briefing</span>
               </h1>
               <p className="text-text-secondary text-sm mt-1">
                 Báo cáo âm nhạc hằng ngày · Sinh tự động bởi Gemini 3.1 Flash-Lite
@@ -103,12 +100,12 @@ export default function BriefingPage() {
           </div>
           <button
             type="button"
-            onClick={() => loadAll(true)}
-            disabled={loading}
+            onClick={refreshAll}
+            disabled={anyValidating}
             data-testid="briefing-refresh"
             className="flex items-center gap-2 bg-bg-card border border-border hover:border-accent-purple/50 text-text-primary text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50"
           >
-            {loading ? (
+            {anyValidating ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <RefreshCw className="h-4 w-4" />
@@ -119,29 +116,29 @@ export default function BriefingPage() {
 
         {/* KPIs */}
         <KpiCardGrid
-          trackCount={d.charts?.data?.length}
+          trackCount={chartsSwr.data?.data?.length}
           viralAvg={
-            d.tiktok?.data?.length
-              ? d.tiktok.data
+            tiktokData.length
+              ? tiktokData
                   .slice(0, 10)
                   .reduce((s, t) => s + (t.viral_score ?? 50), 0) /
-                Math.min(d.tiktok.data.length, 10)
+                Math.min(tiktokData.length, 10)
               : undefined
           }
           sentiment={sentiment?.compound}
-          redditMentions={d.overview?.reddit?.mentions_24h}
+          redditMentions={overviewSwr.data?.reddit?.mentions_24h}
         />
 
-        {/* Briefing + Top charts */}
+        {/* Briefing + Sentiment gauge */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            {loading && !d.briefing ? (
+            {initialLoading && !briefing ? (
               <div className="rounded-2xl border border-border bg-bg-card p-6 animate-pulse h-96" />
-            ) : d.briefing ? (
+            ) : briefing ? (
               <BriefingCard
-                briefing={d.briefing}
-                onRefresh={() => loadAll(true)}
-                loading={loading}
+                briefing={briefing}
+                onRefresh={refreshAll}
+                loading={briefingSwr.isValidating}
               />
             ) : (
               <div className="rounded-2xl border border-border bg-bg-card p-8 text-center text-text-muted">
@@ -161,23 +158,19 @@ export default function BriefingPage() {
 
         {/* Charts row 1 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <TopChartsBar tracks={d.charts?.data ?? []} />
-          <GenreDonut
-            distribution={
-              d.genres?.distribution as Record<string, number> | undefined
-            }
-          />
+          <TopChartsBar tracks={chartsSwr.data?.data ?? []} />
+          <GenreDonut distribution={genresSwr.data?.distribution} />
         </div>
 
         {/* Charts row 2 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <GrowthArea videos={d.youtube?.data ?? []} />
-          <ViralHeatmap tracks={d.tiktok?.data ?? []} />
+          <GrowthArea videos={youtubeSwr.data?.data ?? []} />
+          <ViralHeatmap tracks={tiktokData} />
         </div>
 
         {/* Charts row 3 */}
         <div className="grid grid-cols-1 gap-6">
-          <PredictionRadar candidates={d.candidates?.data ?? []} />
+          <PredictionRadar candidates={candidatesSwr.data?.data ?? []} />
         </div>
       </div>
     </main>

@@ -3,339 +3,339 @@
     {
       "country": "vietnam",
       "iso_code": "VN",
-      "cluster": 2,
-      "cluster_label": "LATIN-dominant",
-      "pca_x": 2.985145027813692,
-      "pca_y": 0.17854887823336935
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": 0.1953240659515657,
+      "pca_y": 0.14997686482299313
     },
     {
       "country": "japan",
       "iso_code": "JP",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.49739614799947957,
-      "pca_y": 0.6362050214413525
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934026,
+      "pca_y": -0.31291550866627266
     },
     {
       "country": "south korea",
       "iso_code": "KR",
-      "cluster": 4,
+      "cluster": 2,
       "cluster_label": "K-POP-dominant",
-      "pca_x": -0.7427881537403197,
-      "pca_y": 0.8037684655581534
+      "pca_x": -1.5206826593307963,
+      "pca_y": -2.077938359073829
     },
     {
       "country": "thailand",
       "iso_code": "TH",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.4973961479994797,
-      "pca_y": 0.6362050214413509
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934026,
+      "pca_y": -0.31291550866627293
     },
     {
       "country": "indonesia",
       "iso_code": "ID",
-      "cluster": 1,
+      "cluster": 0,
       "cluster_label": "POP-dominant",
-      "pca_x": -1.112436303498127,
-      "pca_y": -1.262537193074353
+      "pca_x": 2.085465838863105,
+      "pca_y": 0.15801808847297427
     },
     {
       "country": "philippines",
       "iso_code": "PH",
       "cluster": 0,
       "cluster_label": "POP-dominant",
-      "pca_x": -1.3624857593037611,
-      "pca_y": 1.0285564242162344
+      "pca_x": 2.222574602395346,
+      "pca_y": 0.17502213522855795
     },
     {
       "country": "india",
       "iso_code": "IN",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.49739614799947957,
-      "pca_y": 0.6362050214413514
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934031,
+      "pca_y": -0.31291550866627194
     },
     {
       "country": "taiwan",
       "iso_code": "TW",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.4973961479994795,
-      "pca_y": 0.6362050214413515
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934027,
+      "pca_y": -0.3129155086662735
     },
     {
       "country": "singapore",
       "iso_code": "SG",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.49739614799947957,
-      "pca_y": 0.6362050214413509
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934027,
+      "pca_y": -0.3129155086662735
     },
     {
       "country": "malaysia",
       "iso_code": "MY",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.4973961479994795,
-      "pca_y": 0.6362050214413515
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934031,
+      "pca_y": -0.31291550866627327
     },
     {
       "country": "china",
       "iso_code": "CN",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.4973961479994793,
-      "pca_y": 0.6362050214413515
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934027,
+      "pca_y": -0.31291550866627355
     },
     {
       "country": "united states",
       "iso_code": "US",
-      "cluster": 1,
+      "cluster": 0,
       "cluster_label": "POP-dominant",
-      "pca_x": -0.48754772363916926,
-      "pca_y": -2.160326562971869
+      "pca_x": 2.3937426953745824,
+      "pca_y": -0.004557800436984311
     },
     {
       "country": "canada",
       "iso_code": "CA",
-      "cluster": 1,
+      "cluster": 0,
       "cluster_label": "POP-dominant",
-      "pca_x": -1.2548321300177228,
-      "pca_y": -1.7342619459519137
+      "pca_x": 3.295423956389284,
+      "pca_y": -0.008661828332999374
     },
     {
       "country": "brazil",
       "iso_code": "BR",
-      "cluster": 2,
+      "cluster": 4,
       "cluster_label": "LATIN-dominant",
-      "pca_x": 3.0295605173052342,
-      "pca_y": 0.3106871319559055
+      "pca_x": -0.7307923369774953,
+      "pca_y": 0.15014675099959923
     },
     {
       "country": "mexico",
       "iso_code": "MX",
-      "cluster": 5,
-      "cluster_label": "JAZZ-dominant",
-      "pca_x": -0.47839808908996856,
-      "pca_y": 4.0550583995359135
+      "cluster": 2,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": -1.2013258461895324,
+      "pca_y": -1.2864765008847003
     },
     {
       "country": "argentina",
       "iso_code": "AR",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.4973961479994794,
-      "pca_y": 0.6362050214413515
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934028,
+      "pca_y": -0.3129155086662733
     },
     {
       "country": "colombia",
       "iso_code": "CO",
-      "cluster": 2,
+      "cluster": 4,
       "cluster_label": "LATIN-dominant",
-      "pca_x": 0.6405203516278184,
-      "pca_y": 0.8849685374100212
+      "pca_x": -1.0322669816149073,
+      "pca_y": -0.34986505156706516
     },
     {
       "country": "chile",
       "iso_code": "CL",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.4973961479994794,
-      "pca_y": 0.6362050214413515
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934028,
+      "pca_y": -0.3129155086662733
     },
     {
       "country": "peru",
       "iso_code": "PE",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.4973961479994794,
-      "pca_y": 0.6362050214413515
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934028,
+      "pca_y": -0.3129155086662733
     },
     {
       "country": "united kingdom",
       "iso_code": "GB",
-      "cluster": 1,
+      "cluster": 0,
       "cluster_label": "POP-dominant",
-      "pca_x": -0.3962966870520843,
-      "pca_y": -1.635149639971702
+      "pca_x": 2.455173821661609,
+      "pca_y": -0.1925480243324712
     },
     {
       "country": "france",
       "iso_code": "FR",
       "cluster": 1,
-      "cluster_label": "POP-dominant",
-      "pca_x": 0.4239893037246888,
-      "pca_y": -3.0482872547655866
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.5097139558455516,
+      "pca_y": 0.028304865195179614
     },
     {
       "country": "germany",
       "iso_code": "DE",
       "cluster": 0,
       "cluster_label": "POP-dominant",
-      "pca_x": -2.8422509274057424,
-      "pca_y": 0.13675293938911767
+      "pca_x": 4.021417050843926,
+      "pca_y": 0.14331400898274888
     },
     {
       "country": "spain",
       "iso_code": "ES",
       "cluster": 1,
-      "cluster_label": "POP-dominant",
-      "pca_x": 1.1320671032242873,
-      "pca_y": -0.7488905302584696
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9863817028873549,
+      "pca_y": -0.5462376480434077
     },
     {
       "country": "italy",
       "iso_code": "IT",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.4973961479994794,
-      "pca_y": 0.6362050214413515
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934028,
+      "pca_y": -0.3129155086662733
     },
     {
       "country": "netherlands",
       "iso_code": "NL",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": 1.0918537077372028,
-      "pca_y": 1.2772254895052955
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.7146389292796171,
+      "pca_y": 0.12554177944134398
     },
     {
       "country": "sweden",
       "iso_code": "SE",
       "cluster": 1,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.23964957303404757,
-      "pca_y": -0.6963168183917777
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9863817028873549,
+      "pca_y": -0.5462376480434077
     },
     {
       "country": "norway",
       "iso_code": "NO",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.4973961479994794,
-      "pca_y": 0.6362050214413515
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934028,
+      "pca_y": -0.3129155086662733
     },
     {
       "country": "poland",
       "iso_code": "PL",
       "cluster": 3,
       "cluster_label": "REGGAE-dominant",
-      "pca_x": 2.955114943895127,
-      "pca_y": -0.4270321647349789
+      "pca_x": -1.4349509399079203,
+      "pca_y": 5.375951967485588
     },
     {
       "country": "portugal",
       "iso_code": "PT",
-      "cluster": 3,
-      "cluster_label": "REGGAE-dominant",
-      "pca_x": 2.360238177661327,
-      "pca_y": -0.3174736227309302
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.968506054651871,
+      "pca_y": 1.891093633320754
     },
     {
       "country": "belgium",
       "iso_code": "BE",
       "cluster": 1,
-      "cluster_label": "POP-dominant",
-      "pca_x": -1.9509186231364783,
-      "pca_y": -1.0723349524931782
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": 0.09234135447596259,
+      "pca_y": -0.07828097070448368
     },
     {
       "country": "switzerland",
       "iso_code": "CH",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": 1.9593467398115572,
-      "pca_y": 0.17562041885846802
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.49400714433644866,
+      "pca_y": 1.2840466412004596
     },
     {
       "country": "austria",
       "iso_code": "AT",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.4973961479994794,
-      "pca_y": 0.6362050214413515
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934028,
+      "pca_y": -0.3129155086662733
     },
     {
       "country": "denmark",
       "iso_code": "DK",
-      "cluster": 1,
-      "cluster_label": "POP-dominant",
-      "pca_x": 0.5221740306343083,
-      "pca_y": -0.7479341923302468
+      "cluster": 5,
+      "cluster_label": "CLASSICAL-dominant",
+      "pca_x": -1.0721649391512815,
+      "pca_y": -0.1959929640374707
     },
     {
       "country": "finland",
       "iso_code": "FI",
       "cluster": 1,
-      "cluster_label": "POP-dominant",
-      "pca_x": 0.2631251982421977,
-      "pca_y": -1.3407345241377995
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934028,
+      "pca_y": -0.3129155086662733
     },
     {
       "country": "turkey",
       "iso_code": "TR",
       "cluster": 0,
       "cluster_label": "POP-dominant",
-      "pca_x": 1.8916440176779357,
-      "pca_y": 0.06192361598723569
+      "pca_x": 1.9425007427346066,
+      "pca_y": -0.09303699168509412
     },
     {
       "country": "russia",
       "iso_code": "RU",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": 1.4679230283106275,
-      "pca_y": -0.15313580972485694
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.851894833337859,
+      "pca_y": 1.0198790497795456
     },
     {
       "country": "nigeria",
       "iso_code": "NG",
-      "cluster": 1,
+      "cluster": 0,
       "cluster_label": "POP-dominant",
-      "pca_x": 0.507414046110711,
-      "pca_y": -0.7077502510321048
+      "pca_x": 2.9715783187321474,
+      "pca_y": 0.3552735633284939
     },
     {
       "country": "south africa",
       "iso_code": "ZA",
-      "cluster": 1,
+      "cluster": 0,
       "cluster_label": "POP-dominant",
-      "pca_x": -0.41459946222577154,
-      "pca_y": -1.381997192260086
+      "pca_x": 2.58273559167761,
+      "pca_y": 0.010023681587203211
     },
     {
       "country": "egypt",
       "iso_code": "EG",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.4973961479994795,
-      "pca_y": 0.6362050214413514
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934028,
+      "pca_y": -0.3129155086662733
     },
     {
       "country": "australia",
       "iso_code": "AU",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": -0.4973961479994795,
-      "pca_y": 0.6362050214413514
+      "cluster": 1,
+      "cluster_label": "ELECTRONIC-dominant",
+      "pca_x": -0.9123240131934028,
+      "pca_y": -0.3129155086662733
     },
     {
       "country": "new zealand",
       "iso_code": "NZ",
       "cluster": 0,
       "cluster_label": "POP-dominant",
-      "pca_x": -2.486970541641332,
-      "pca_y": -1.0220229674401289
+      "pca_x": 2.8426141983926843,
+      "pca_y": -0.4801111040431523
     }
   ],
   "cluster_labels": {
-    "2": "LATIN-dominant",
+    "1": "ELECTRONIC-dominant",
+    "2": "K-POP-dominant",
     "0": "POP-dominant",
-    "4": "K-POP-dominant",
-    "1": "POP-dominant",
-    "5": "JAZZ-dominant",
-    "3": "REGGAE-dominant"
+    "4": "LATIN-dominant",
+    "3": "REGGAE-dominant",
+    "5": "CLASSICAL-dominant"
   },
   "n_clusters": 6,
   "total_countries": 41,

@@ -17,7 +17,7 @@
 
 from fastapi import APIRouter, Query
 from app.services.lastfm import get_global_top_tracks, get_top_tracks_by_country
-from app.services.spotify import get_playlist_tracks
+from app.services.spotify import get_playlist_tracks, SpotifyConfigError
 
 router = APIRouter()
 
@@ -58,12 +58,26 @@ async def country_top_charts(country: str, limit: int = Query(50, le=200)):
     }
 
 
+_REASON_MESSAGES = {
+    "missing_env": "Cần SPOTIFY_CLIENT_ID và SPOTIFY_CLIENT_SECRET trong backend/.env",
+    "invalid_credentials": "Credentials Spotify không hợp lệ — kiểm tra lại Client ID/Secret",
+    "rate_limit": "Spotify đang rate-limit — thử lại sau ít phút",
+}
+
+
+def _spotify_error_payload(err: Exception) -> dict:
+    if isinstance(err, SpotifyConfigError):
+        return {
+            "data": [],
+            "reason": err.reason,
+            "message": _REASON_MESSAGES.get(err.reason, str(err)),
+        }
+    return {"data": [], "reason": "unknown", "message": str(err)}
+
+
 @router.get("/spotify")
 async def spotify_top_charts(limit: int = Query(50, le=50)):
-    """
-    Top tracks từ Spotify Global Top 50 playlist.
-    Nguồn: Spotify Web API (playlist public, không cần OAuth user)
-    """
+    """Top tracks từ Spotify Global Top 50 playlist."""
     try:
         tracks = await get_playlist_tracks(SPOTIFY_GLOBAL_TOP50_ID)
         return {
@@ -74,11 +88,7 @@ async def spotify_top_charts(limit: int = Query(50, le=50)):
             "source_url":  f"https://open.spotify.com/playlist/{SPOTIFY_GLOBAL_TOP50_ID}",
         }
     except Exception as e:
-        return {
-            "error":   str(e),
-            "data":    [],
-            "message": "Cần SPOTIFY_CLIENT_ID và SPOTIFY_CLIENT_SECRET trong .env",
-        }
+        return _spotify_error_payload(e)
 
 
 @router.get("/spotify/viral")
@@ -92,4 +102,4 @@ async def spotify_viral_charts():
             "source_url": f"https://open.spotify.com/playlist/{SPOTIFY_VIRAL50_ID}",
         }
     except Exception as e:
-        return {"error": str(e), "data": []}
+        return _spotify_error_payload(e)

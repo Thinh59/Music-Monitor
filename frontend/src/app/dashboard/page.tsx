@@ -224,6 +224,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [errors,  setErrors]  = useState<string[]>([]);
 
+  const [timeFilter, setTimeFilter] = useState<"today"|"week"|"month">("today");
+
   useEffect(() => {
     async function loadAll() {
       setLoading(true);
@@ -324,6 +326,18 @@ export default function Dashboard() {
         <div>
           <h1 className="text-3xl font-bold text-white">🎵 Global Music Intelligence Monitor</h1>
           <p className="text-gray-400 mt-1 text-sm">Real-time · Last.fm · YouTube · Reddit · Spotify · Claude AI</p>
+          <div className="flex gap-2 mt-3">
+            {(["today","week","month"] as const).map((f) => (
+              <button key={f} onClick={() => setTimeFilter(f)}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                  timeFilter === f
+                    ? "bg-indigo-600 text-white"
+                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                }`}>
+                {f === "today" ? "Today" : f === "week" ? "This Week" : "This Month"}
+              </button>
+            ))}
+</div>
         </div>
 
         {/* ── Error notices (non-fatal) ── */}

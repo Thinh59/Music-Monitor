@@ -103,35 +103,58 @@ async def get_trends_overview():
 async def get_youtube_batch(limit: int = Query(8, le=12)):
     """
     YouTube MV stats cho top bài hát (Last.fm → YouTube search → stats).
-    Nguồn: Last.fm + YouTube Data API v3
-    """
-    top_tracks = await get_global_top_tracks(limit=10)
-    results    = []
+    Nguồn: Last.fm + YouTube Data API v3.
 
+    Resilient: nếu Last.fm timeout hoặc YouTube quota exhausted, trả mảng
+    rỗng kèm warning thay vì 500.
+    """
+    warnings: list[str] = []
+
+    try:
+        top_tracks = await get_global_top_tracks(limit=10)
+    except Exception as e:
+        warnings.append(f"Last.fm error: {e}")
+        top_tracks = []
+
+    if not top_tracks:
+        return {
+            "data": [],
+            "source": "Last.fm + YouTube Data API v3",
+            "warnings": warnings or ["Last.fm không trả được top tracks"],
+        }
+
+    results: list[dict] = []
     for track in top_tracks[:limit]:
-        query   = f"{track['name']} {track['artist']} official music video"
-        yt_hits = await search_music_video(query)
-        if not yt_hits:
+        try:
+            query = f"{track['name']} {track['artist']} official music video"
+            yt_hits = await search_music_video(query)
+            if not yt_hits:
+                continue
+            stats = await get_video_stats(yt_hits[0]["video_id"])
+            if not stats:
+                continue
+            results.append({
+                "track_name":    track["name"],
+                "artist":        track["artist"],
+                "video_id":      yt_hits[0]["video_id"],
+                "title":         stats.get("title", yt_hits[0]["title"]),
+                "view_count":    stats.get("view_count", 0),
+                "like_count":    stats.get("like_count", 0),
+                "comment_count": stats.get("comment_count", 0),
+                "thumbnail":     yt_hits[0].get("thumbnail"),
+                "channel":       yt_hits[0].get("channel"),
+                "source":        "YouTube Data API v3",
+                "source_url":    f"https://www.youtube.com/watch?v={yt_hits[0]['video_id']}",
+            })
+        except Exception as e:
+            warnings.append(f"{track.get('name', '?')}: {e}")
             continue
-        stats = await get_video_stats(yt_hits[0]["video_id"])
-        if not stats:
-            continue
-        results.append({
-            "track_name":    track["name"],
-            "artist":        track["artist"],
-            "video_id":      yt_hits[0]["video_id"],
-            "title":         stats.get("title", yt_hits[0]["title"]),
-            "view_count":    stats.get("view_count", 0),
-            "like_count":    stats.get("like_count", 0),
-            "comment_count": stats.get("comment_count", 0),
-            "thumbnail":     yt_hits[0].get("thumbnail"),
-            "channel":       yt_hits[0].get("channel"),
-            "source":        "YouTube Data API v3",
-            "source_url":    f"https://www.youtube.com/watch?v={yt_hits[0]['video_id']}",
-        })
 
     results.sort(key=lambda x: x["view_count"], reverse=True)
-    return {"data": results, "source": "Last.fm + YouTube Data API v3"}
+    payload = {"data": results, "source": "Last.fm + YouTube Data API v3"}
+    if warnings:
+        payload["warnings"] = warnings[:5]
+    return payload
 
 
 @router.get("/reddit-insight")

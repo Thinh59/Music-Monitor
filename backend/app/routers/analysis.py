@@ -13,6 +13,56 @@ from app.database          import get_db
 router = APIRouter()
 db     = get_db()
 
+# Cache phân phối genre theo ngày để né rate-limit Last.fm
+from datetime import date as _date
+_genre_cache: dict[str, dict] = {}
+
+
+@router.get("/distribution/genre")
+async def genre_distribution(top_n_artists: int = Query(20, le=50)):
+    """
+    Phân phối thể loại từ top artists toàn cầu.
+    Mỗi nghệ sĩ → top tags Last.fm → đếm tần suất.
+    Cache theo ngày để tránh gọi Last.fm hàng chục lần.
+    """
+    cache_key = f"{_date.today()}:{top_n_artists}"
+    if cache_key in _genre_cache:
+        return _genre_cache[cache_key]
+
+    tracks = await get_global_top_tracks(limit=top_n_artists)
+    if not tracks:
+        return {"distribution": {}, "total": 0, "source": "Last.fm (no data)"}
+
+    seen_artists: set[str] = set()
+    counts: dict[str, int] = {}
+
+    for t in tracks:
+        artist = t.get("artist", "")
+        if not artist or artist.lower() in seen_artists:
+            continue
+        seen_artists.add(artist.lower())
+        try:
+            tags = await get_artist_tags(artist)
+        except Exception:
+            tags = []
+        for tag in tags[:3]:  # mỗi nghệ sĩ chỉ tính 3 tag đầu để giảm noise
+            tag_norm = tag.strip().lower()
+            if not tag_norm or tag_norm in {"seen live", "favorite"}:
+                continue
+            counts[tag_norm] = counts.get(tag_norm, 0) + 1
+        await asyncio.sleep(0.04)
+
+    # Sort + giữ top 12 tag
+    sorted_counts = dict(sorted(counts.items(), key=lambda x: x[1], reverse=True)[:12])
+    payload = {
+        "distribution": sorted_counts,
+        "total": sum(sorted_counts.values()),
+        "artists_sampled": len(seen_artists),
+        "source": "Last.fm artist.getTopTags",
+    }
+    _genre_cache[cache_key] = payload
+    return payload
+
 
 @router.get("/genre-comparison")
 async def genre_comparison(

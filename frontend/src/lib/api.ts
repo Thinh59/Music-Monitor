@@ -126,3 +126,41 @@ export async function fetchDailyBriefing(forceRefresh = false) {
   const qs = forceRefresh ? "?force_refresh=true" : "";
   return get(`/api/briefing/daily${qs}`);
 }
+
+// ─── Analysis / Insight & Interpretation ─────────────────────────────────────
+
+/** Market Intelligence Summary — Gemini AI viết (cache theo ngày) */
+export async function fetchMarketSummary() {
+  return get("/api/analysis/insight/market-summary");
+}
+
+/** So sánh genre giữa các quốc gia — EDA comparison */
+export async function fetchGenreComparison(countries = "VN,JP,US,KR,BR,NG") {
+  return get(`/api/analysis/genre-comparison?countries=${countries}`);
+}
+
+/** Phân phối genre toàn cầu — EDA distribution */
+export async function fetchGenreDistribution() {
+  return get("/api/analysis/distribution/genre");
+}
+
+/** Time-series chart toàn cầu (Firestore snapshot hoặc realtime fallback) */
+export async function fetchTimeseriesCharts() {
+  return get("/api/analysis/timeseries/global-charts");
+}
+
+/** Time-series YouTube view count cho 1 bài hát */
+export async function fetchTimeseriesYoutube(trackName: string, artist = "") {
+  const qs = artist ? `?artist=${encodeURIComponent(artist)}` : "";
+  return get(`/api/analysis/timeseries/youtube/${encodeURIComponent(trackName)}${qs}`);
+}
+
+/** Elbow Method info cho K-Means country clustering */
+export async function fetchClusteringElbow() {
+  return get("/api/analysis/clustering/elbow");
+}
+
+/** AI Insight cho 1 quốc gia khi click marker bản đồ */
+export async function fetchCountryAiInsight(isoCode: string) {
+  return get(`/api/map/country/${isoCode}/ai-insight`);
+}

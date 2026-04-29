@@ -4,30 +4,72 @@
 export type SectionBlock =
   | { kind: "lead"; text: string }
   | { kind: "list"; items: { rank: number; primary: string; secondary?: string }[] }
-  | { kind: "para"; text: string };
+  | { kind: "para"; text: string; label?: string };
 
 const LIST_ITEM_RE = /^\s*(\d+)[\.\)]\s+(.+?)(?:\s+[-—–]\s+(.+))?$/;
 
+// Vietnamese (and English) capitalized labels that introduce a new section.
+// Match: "Word Word: " sau dấu kết câu hoặc đầu đoạn.
+const LABEL_RE = /([.!?…])\s+([A-ZÀÁẢÃẠÂẦẤẨẪẬĂẰẮẲẴẶĐÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴ][\p{L}\d ]{2,32}):\s/gu;
+
+const LABEL_AT_LINE_RE = /^([A-ZÀÁẢÃẠÂẦẤẨẪẬĂẰẮẲẴẶĐÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴ][\p{L}\d ]{2,32}):\s+(.+)$/u;
+
+/** Chèn `\n\n` trước các label Vietnamese để tách đoạn. */
+function injectParagraphBreaks(text: string): string {
+  return text.replace(LABEL_RE, "$1\n\n$2: ");
+}
+
 export function parseSectionText(raw: string): SectionBlock[] {
   if (!raw) return [];
-  const text = raw.replace(/\r\n/g, "\n").trim();
+  const text = injectParagraphBreaks(raw.replace(/\r\n/g, "\n").trim());
   if (!text) return [];
 
-  const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+  // Tách paragraphs theo blank line, sau đó split lines bên trong từng para
+  const paragraphs = text
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
   const blocks: SectionBlock[] = [];
-  let buffer: string[] = [];
-  let listBuffer: { rank: number; primary: string; secondary?: string }[] = [];
   let firstBlockEmitted = false;
 
-  const flushBuffer = () => {
-    if (!buffer.length) return;
-    const joined = buffer.join(" ").trim();
-    if (!joined) {
-      buffer = [];
-      return;
+  for (const para of paragraphs) {
+    const lines = para.split("\n").map((l) => l.trim()).filter(Boolean);
+
+    // Detect list (≥2 numbered items consecutive)
+    const listItems: { rank: number; primary: string; secondary?: string }[] = [];
+    let allListy = true;
+    for (const line of lines) {
+      const m = line.match(LIST_ITEM_RE);
+      if (m) {
+        listItems.push({
+          rank: parseInt(m[1], 10),
+          primary: m[2].trim(),
+          secondary: m[3]?.trim(),
+        });
+      } else {
+        allListy = false;
+      }
     }
+    if (allListy && listItems.length >= 2) {
+      blocks.push({ kind: "list", items: listItems });
+      continue;
+    }
+
+    // Otherwise: detect label + body (e.g. "Chủ đề chính: ...")
+    const joined = lines.join(" ").trim();
+    const labelMatch = joined.match(LABEL_AT_LINE_RE);
+
+    if (labelMatch) {
+      const label = labelMatch[1].trim();
+      const body = labelMatch[2].trim();
+      blocks.push({ kind: "para", text: body, label });
+      firstBlockEmitted = true;
+      continue;
+    }
+
+    // First plain paragraph: split lead sentence
     if (!firstBlockEmitted) {
-      // First non-list paragraph: split into lead (1st sentence) + rest
       const split = splitLead(joined);
       blocks.push({ kind: "lead", text: split.lead });
       if (split.rest) blocks.push({ kind: "para", text: split.rest });
@@ -35,46 +77,19 @@ export function parseSectionText(raw: string): SectionBlock[] {
     } else {
       blocks.push({ kind: "para", text: joined });
     }
-    buffer = [];
-  };
-
-  const flushList = () => {
-    if (!listBuffer.length) return;
-    blocks.push({ kind: "list", items: listBuffer });
-    listBuffer = [];
-  };
-
-  for (const line of lines) {
-    const m = line.match(LIST_ITEM_RE);
-    if (m) {
-      flushBuffer();
-      listBuffer.push({
-        rank: parseInt(m[1], 10),
-        primary: m[2].trim(),
-        secondary: m[3]?.trim(),
-      });
-    } else {
-      flushList();
-      buffer.push(line);
-    }
   }
-  flushBuffer();
-  flushList();
+
   return blocks;
 }
 
 function splitLead(text: string): { lead: string; rest: string } {
-  // Tách câu đầu tiên (dừng ở `.`, `!`, `?`, `…` không phải số thập phân)
   const idx = text.search(/(?<![\d])([.!?…])\s+/);
-  if (idx === -1 || idx > 220) {
-    return { lead: text, rest: "" };
-  }
+  if (idx === -1 || idx > 220) return { lead: text, rest: "" };
   const lead = text.slice(0, idx + 1).trim();
   const rest = text.slice(idx + 1).trim();
   return { lead, rest };
 }
 
-// Highlight inline: quoted strings → tokens for renderer to wrap.
 export type InlineToken =
   | { kind: "text"; value: string }
   | { kind: "quote"; value: string }
@@ -88,7 +103,6 @@ export function tokenizeInline(text: string): InlineToken[] {
   const tokens: InlineToken[] = [];
   let lastIdx = 0;
 
-  // Find quotes first (priority), then numbers in non-quote spans
   const quoteMatches: { start: number; end: number; value: string }[] = [];
   for (const m of text.matchAll(QUOTE_RE)) {
     if (m.index === undefined) continue;

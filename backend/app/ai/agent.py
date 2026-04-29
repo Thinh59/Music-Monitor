@@ -27,13 +27,13 @@ ToolFn = Callable[..., Awaitable[Any]]
 TOOLS: dict[str, dict[str, Any]] = {
     "web_search": {
         "fn": duckduckgo.web_search,
-        "description": "Tìm kiếm web qua DuckDuckGo. Dùng khi cần thông tin mới ngoài database.",
-        "params": {"query": "string", "max_results": "int (mặc định 5)"},
+        "description": "Tìm kiếm web qua DuckDuckGo. Dùng khi cần thông tin mới ngoài database. Nếu tìm kiếm thông tin về Việt Nam, hãy đặt region='vi-vn'.",
+        "params": {"query": "string", "max_results": "int (mặc định 5)", "region": "string (mặc định 'wt-wt', ví dụ 'vi-vn' cho Việt Nam)"},
     },
     "web_news": {
         "fn": duckduckgo.web_news,
-        "description": "Tìm tin tức gần đây qua DuckDuckGo News.",
-        "params": {"query": "string", "max_results": "int (mặc định 5)"},
+        "description": "Tìm tin tức gần đây qua DuckDuckGo News. Dùng region='vi-vn' để tìm tin Việt Nam.",
+        "params": {"query": "string", "max_results": "int (mặc định 5)", "region": "string (mặc định 'wt-wt')"},
     },
     "get_global_charts": {
         "fn": data_query.get_global_charts,
@@ -93,9 +93,12 @@ QUY TẮC TRẢ LỜI:
 2. Nếu cần dùng tool: {{"thought": "lý do ngắn", "action": "tên_tool", "input": {{...}}}}
 3. Nếu đã đủ thông tin: {{"thought": "lý do", "final_answer": "câu trả lời tiếng Việt, plain text"}}
 4. Để xác minh thông tin, dùng ít nhất 2 nguồn khác nhau (web_search + dữ liệu nội bộ) trước khi trả lời.
-5. Trong final_answer: KHÔNG dùng markdown, KHÔNG dùng ## hay **. Chỉ plain text với xuống dòng \\n.
-6. Nếu tool báo lỗi, thử tool khác hoặc trả lời "Không tìm thấy dữ liệu".
-7. Tối đa 6 vòng tool — sau đó BẮT BUỘC trả final_answer.
+5. KIẾN THỨC VỀ VIỆT NAM (QUAN TRỌNG):
+   - Khi hỏi "bài hát hot nhất Việt Nam / top trending VN", hạn chế chỉ dựa vào dữ liệu Last.fm "vietnam" (get_country_top) vì data ít và lỗi thời.
+   - BẮT BUỘC ưu tiên sử dụng web_search(query="Bảng xếp hạng âm nhạc Việt Nam Zing MP3, Nhaccuatui, Spotify VN hoặc YouTube trending music VN", region="vi-vn") & web_news(query="nhạc Việt Nam tiktok trending", region="vi-vn") để có thông tin V-Pop mới nhất và chính xác nhất. HÃY dùng web_search để tự do tìm hiểu rộng hơn nếu thấy cần thiết.
+6. Trong final_answer: KHÔNG dùng markdown, KHÔNG dùng ## hay **. Chỉ plain text với xuống dòng \\n.
+7. Nếu tool báo lỗi, thử tool khác hoặc trả lời "Không tìm thấy dữ liệu".
+8. Tối đa 6 vòng tool — sau đó BẮT BUỘC trả final_answer.
 """
 
 MAX_ITERATIONS = 6

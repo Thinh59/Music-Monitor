@@ -3,342 +3,726 @@
     {
       "country": "vietnam",
       "iso_code": "VN",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": 0.1953240659515657,
-      "pca_y": 0.14997686482299313
+      "cluster": 2,
+      "cluster_label": "LATIN-dominant",
+      "pca_x": 0.4245588343601414,
+      "pca_y": -4.712609733986378
     },
     {
       "country": "japan",
       "iso_code": "JP",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934026,
-      "pca_y": -0.31291550866627266
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": 0.9165907070840668,
+      "pca_y": 0.07741207386513521
     },
     {
       "country": "south korea",
       "iso_code": "KR",
-      "cluster": 2,
+      "cluster": 1,
       "cluster_label": "K-POP-dominant",
-      "pca_x": -1.5206826593307963,
-      "pca_y": -2.077938359073829
+      "pca_x": 4.040959626376407,
+      "pca_y": 1.1174887827484745
     },
     {
       "country": "thailand",
       "iso_code": "TH",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934026,
-      "pca_y": -0.31291550866627293
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.9622031507770423,
+      "pca_y": 0.3367460725504338
     },
     {
       "country": "indonesia",
       "iso_code": "ID",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": 2.085465838863105,
-      "pca_y": 0.15801808847297427
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": -0.2820681552444165,
+      "pca_y": -1.241727137046527
     },
     {
       "country": "philippines",
       "iso_code": "PH",
       "cluster": 0,
       "cluster_label": "POP-dominant",
-      "pca_x": 2.222574602395346,
-      "pca_y": 0.17502213522855795
+      "pca_x": -1.5003881831054564,
+      "pca_y": 0.2235448133042998
     },
     {
       "country": "india",
       "iso_code": "IN",
       "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934031,
-      "pca_y": -0.31291550866627194
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385707,
+      "pca_y": 0.5621668775113643
     },
     {
       "country": "taiwan",
       "iso_code": "TW",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934027,
-      "pca_y": -0.3129155086662735
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -0.910515749462904,
+      "pca_y": 0.827639808388811
     },
     {
       "country": "singapore",
       "iso_code": "SG",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934027,
-      "pca_y": -0.3129155086662735
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.9622031507770414,
+      "pca_y": 0.3367460725504336
     },
     {
       "country": "malaysia",
       "iso_code": "MY",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934031,
-      "pca_y": -0.31291550866627327
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -2.4322706533886156,
+      "pca_y": 1.0147405267307614
     },
     {
       "country": "china",
       "iso_code": "CN",
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.8103471732910543,
+      "pca_y": 0.38718534115030306
+    },
+    {
+      "country": "hong kong",
+      "iso_code": "HK",
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -2.4322706533886156,
+      "pca_y": 1.0147405267307614
+    },
+    {
+      "country": "myanmar",
+      "iso_code": "MM",
       "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934027,
-      "pca_y": -0.31291550866627355
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "cambodia",
+      "iso_code": "KH",
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": -0.5602531778823082,
+      "pca_y": -1.1324440950563546
+    },
+    {
+      "country": "bangladesh",
+      "iso_code": "BD",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 2.5707286787007355,
+      "pca_y": 0.006844972274254642
+    },
+    {
+      "country": "pakistan",
+      "iso_code": "PK",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "sri lanka",
+      "iso_code": "LK",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "nepal",
+      "iso_code": "NP",
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": 0.4399102671817891,
+      "pca_y": 0.6561941695981922
+    },
+    {
+      "country": "mongolia",
+      "iso_code": "MN",
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": -0.8639651328542836,
+      "pca_y": -1.2333226322560937
+    },
+    {
+      "country": "kazakhstan",
+      "iso_code": "KZ",
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -2.584126630874603,
+      "pca_y": 0.9643012581308918
+    },
+    {
+      "country": "united arab emirates",
+      "iso_code": "AE",
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.968816088067745,
+      "pca_y": 0.23753371410316287
+    },
+    {
+      "country": "saudi arabia",
+      "iso_code": "SA",
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.968816088067745,
+      "pca_y": 0.23753371410316287
+    },
+    {
+      "country": "israel",
+      "iso_code": "IL",
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -2.584126630874603,
+      "pca_y": 0.9643012581308918
+    },
+    {
+      "country": "iraq",
+      "iso_code": "IQ",
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": -0.8712085447157963,
+      "pca_y": -1.1898955704052079
+    },
+    {
+      "country": "jordan",
+      "iso_code": "JO",
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.976059499929258,
+      "pca_y": 0.28096077595404906
+    },
+    {
+      "country": "lebanon",
+      "iso_code": "LB",
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -2.584126630874603,
+      "pca_y": 0.9643012581308918
     },
     {
       "country": "united states",
       "iso_code": "US",
-      "cluster": 0,
+      "cluster": 3,
       "cluster_label": "POP-dominant",
-      "pca_x": 2.3937426953745824,
-      "pca_y": -0.004557800436984311
+      "pca_x": -1.987730083111125,
+      "pca_y": 0.1265844933605223
     },
     {
       "country": "canada",
       "iso_code": "CA",
-      "cluster": 0,
+      "cluster": 3,
       "cluster_label": "POP-dominant",
-      "pca_x": 3.295423956389284,
-      "pca_y": -0.008661828332999374
+      "pca_x": -2.584126630874603,
+      "pca_y": 0.9643012581308918
     },
     {
       "country": "brazil",
       "iso_code": "BR",
-      "cluster": 4,
+      "cluster": 2,
       "cluster_label": "LATIN-dominant",
-      "pca_x": -0.7307923369774953,
-      "pca_y": 0.15014675099959923
+      "pca_x": 0.29362617821933257,
+      "pca_y": -3.365791541702661
     },
     {
       "country": "mexico",
       "iso_code": "MX",
-      "cluster": 2,
-      "cluster_label": "K-POP-dominant",
-      "pca_x": -1.2013258461895324,
-      "pca_y": -1.2864765008847003
+      "cluster": 5,
+      "cluster_label": "JAZZ-dominant",
+      "pca_x": 0.35712974358343935,
+      "pca_y": -2.407114382274055
     },
     {
       "country": "argentina",
       "iso_code": "AR",
       "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934028,
-      "pca_y": -0.3129155086662733
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
     },
     {
       "country": "colombia",
       "iso_code": "CO",
-      "cluster": 4,
-      "cluster_label": "LATIN-dominant",
-      "pca_x": -1.0322669816149073,
-      "pca_y": -0.34986505156706516
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 2.6258438996212763,
+      "pca_y": -1.3097379438104861
     },
     {
       "country": "chile",
       "iso_code": "CL",
       "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934028,
-      "pca_y": -0.3129155086662733
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 1.7840892486128606,
+      "pca_y": 0.7492675958533143
     },
     {
       "country": "peru",
       "iso_code": "PE",
       "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934028,
-      "pca_y": -0.3129155086662733
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "venezuela",
+      "iso_code": "VE",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "bolivia",
+      "iso_code": "BO",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "ecuador",
+      "iso_code": "EC",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "uruguay",
+      "iso_code": "UY",
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": 0.28180725448217886,
+      "pca_y": 0.8702739660440645
+    },
+    {
+      "country": "paraguay",
+      "iso_code": "PY",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "guatemala",
+      "iso_code": "GT",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "costa rica",
+      "iso_code": "CR",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "panama",
+      "iso_code": "PA",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "puerto rico",
+      "iso_code": "PR",
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.7919754329842073,
+      "pca_y": -0.05167563087794359
+    },
+    {
+      "country": "dominican republic",
+      "iso_code": "DO",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "jamaica",
+      "iso_code": "JM",
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.2205635628182796,
+      "pca_y": -0.5497437820673373
+    },
+    {
+      "country": "cuba",
+      "iso_code": "CU",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 1.948805198603174,
+      "pca_y": 0.6344001578547128
     },
     {
       "country": "united kingdom",
       "iso_code": "GB",
-      "cluster": 0,
+      "cluster": 3,
       "cluster_label": "POP-dominant",
-      "pca_x": 2.455173821661609,
-      "pca_y": -0.1925480243324712
+      "pca_x": -2.1203061634766525,
+      "pca_y": 0.5508258689963059
     },
     {
       "country": "france",
       "iso_code": "FR",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.5097139558455516,
-      "pca_y": 0.028304865195179614
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": 0.31432839251906103,
+      "pca_y": -2.079443901816898
     },
     {
       "country": "germany",
       "iso_code": "DE",
-      "cluster": 0,
+      "cluster": 3,
       "cluster_label": "POP-dominant",
-      "pca_x": 4.021417050843926,
-      "pca_y": 0.14331400898274888
+      "pca_x": -2.751825049517676,
+      "pca_y": 1.3670230087820443
     },
     {
       "country": "spain",
       "iso_code": "ES",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9863817028873549,
-      "pca_y": -0.5462376480434077
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": 0.026865632283639307,
+      "pca_y": -1.458666202968759
     },
     {
       "country": "italy",
       "iso_code": "IT",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934028,
-      "pca_y": -0.3129155086662733
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -2.584126630874603,
+      "pca_y": 0.9643012581308918
     },
     {
       "country": "netherlands",
       "iso_code": "NL",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.7146389292796171,
-      "pca_y": 0.12554177944134398
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -2.584126630874603,
+      "pca_y": 0.9643012581308918
     },
     {
       "country": "sweden",
       "iso_code": "SE",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9863817028873549,
-      "pca_y": -0.5462376480434077
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": 0.026865632283639307,
+      "pca_y": -1.458666202968759
     },
     {
       "country": "norway",
       "iso_code": "NO",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934028,
-      "pca_y": -0.3129155086662733
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.0431806529982084,
+      "pca_y": -0.28914293427755644
     },
     {
       "country": "poland",
       "iso_code": "PL",
-      "cluster": 3,
-      "cluster_label": "REGGAE-dominant",
-      "pca_x": -1.4349509399079203,
-      "pca_y": 5.375951967485588
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": -0.49649591317106667,
+      "pca_y": -1.9223541038764218
     },
     {
       "country": "portugal",
       "iso_code": "PT",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.968506054651871,
-      "pca_y": 1.891093633320754
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.9367634943278071,
+      "pca_y": -0.6784134772697323
     },
     {
       "country": "belgium",
       "iso_code": "BE",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": 0.09234135447596259,
-      "pca_y": -0.07828097070448368
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -0.8966341528538163,
+      "pca_y": -0.46257104333393273
     },
     {
       "country": "switzerland",
       "iso_code": "CH",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.49400714433644866,
-      "pca_y": 1.2840466412004596
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": -0.3920874698646555,
+      "pca_y": -1.5873626329539143
     },
     {
       "country": "austria",
       "iso_code": "AT",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934028,
-      "pca_y": -0.3129155086662733
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -2.584126630874603,
+      "pca_y": 0.9643012581308918
     },
     {
       "country": "denmark",
       "iso_code": "DK",
-      "cluster": 5,
-      "cluster_label": "CLASSICAL-dominant",
-      "pca_x": -1.0721649391512815,
-      "pca_y": -0.1959929640374707
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": 0.37296266112143145,
+      "pca_y": -1.8148484156121656
     },
     {
       "country": "finland",
       "iso_code": "FI",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934028,
-      "pca_y": -0.3129155086662733
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": 0.36538225718722817,
+      "pca_y": -1.6591207434370747
     },
     {
       "country": "turkey",
       "iso_code": "TR",
       "cluster": 0,
       "cluster_label": "POP-dominant",
-      "pca_x": 1.9425007427346066,
-      "pca_y": -0.09303699168509412
+      "pca_x": -1.6722593251230062,
+      "pca_y": -0.31061029991525657
     },
     {
       "country": "russia",
       "iso_code": "RU",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.851894833337859,
-      "pca_y": 1.0198790497795456
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": 0.35069913839143707,
+      "pca_y": -1.7991789563403975
+    },
+    {
+      "country": "ireland",
+      "iso_code": "IE",
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.9555902134863385,
+      "pca_y": 0.4359584309977045
+    },
+    {
+      "country": "iceland",
+      "iso_code": "IS",
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.8103471732910543,
+      "pca_y": 0.38718534115030306
+    },
+    {
+      "country": "greece",
+      "iso_code": "GR",
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.8103471732910543,
+      "pca_y": 0.38718534115030306
+    },
+    {
+      "country": "czech republic",
+      "iso_code": "CZ",
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -2.584126630874603,
+      "pca_y": 0.9643012581308918
+    },
+    {
+      "country": "hungary",
+      "iso_code": "HU",
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.0431806529982084,
+      "pca_y": -0.28914293427755644
+    },
+    {
+      "country": "romania",
+      "iso_code": "RO",
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -2.584126630874603,
+      "pca_y": 0.9643012581308918
+    },
+    {
+      "country": "slovakia",
+      "iso_code": "SK",
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -2.584126630874603,
+      "pca_y": 0.9643012581308918
+    },
+    {
+      "country": "croatia",
+      "iso_code": "HR",
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.8103471732910543,
+      "pca_y": 0.38718534115030306
+    },
+    {
+      "country": "bulgaria",
+      "iso_code": "BG",
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.8169601105817572,
+      "pca_y": 0.2879729827030323
+    },
+    {
+      "country": "serbia",
+      "iso_code": "RS",
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.1884236931934926,
+      "pca_y": -0.2403698444301551
+    },
+    {
+      "country": "ukraine",
+      "iso_code": "UA",
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -0.45330821935565685,
+      "pca_y": 0.31495206080695454
     },
     {
       "country": "nigeria",
       "iso_code": "NG",
-      "cluster": 0,
-      "cluster_label": "POP-dominant",
-      "pca_x": 2.9715783187321474,
-      "pca_y": 0.3552735633284939
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": -0.5674965897438213,
+      "pca_y": -1.089017033205469
     },
     {
       "country": "south africa",
       "iso_code": "ZA",
-      "cluster": 0,
+      "cluster": 3,
       "cluster_label": "POP-dominant",
-      "pca_x": 2.58273559167761,
-      "pca_y": 0.010023681587203211
+      "pca_x": -2.114059128263029,
+      "pca_y": 0.2863068039505644
     },
     {
       "country": "egypt",
       "iso_code": "EG",
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": -0.585780110216392,
+      "pca_y": -1.3426056742462666
+    },
+    {
+      "country": "kenya",
+      "iso_code": "KE",
       "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934028,
-      "pca_y": -0.3129155086662733
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "morocco",
+      "iso_code": "MA",
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.0818446367439216,
+      "pca_y": 0.843294887940142
+    },
+    {
+      "country": "algeria",
+      "iso_code": "DZ",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "tunisia",
+      "iso_code": "TN",
+      "cluster": 0,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.8169601105817572,
+      "pca_y": 0.2879729827030323
+    },
+    {
+      "country": "ethiopia",
+      "iso_code": "ET",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "ghana",
+      "iso_code": "GH",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "senegal",
+      "iso_code": "SN",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "uganda",
+      "iso_code": "UG",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
+    },
+    {
+      "country": "zimbabwe",
+      "iso_code": "ZW",
+      "cluster": 4,
+      "cluster_label": "INDIE-dominant",
+      "pca_x": -0.6113070425504756,
+      "pca_y": -1.5527672534361772
     },
     {
       "country": "australia",
       "iso_code": "AU",
-      "cluster": 1,
-      "cluster_label": "ELECTRONIC-dominant",
-      "pca_x": -0.9123240131934028,
-      "pca_y": -0.3129155086662733
+      "cluster": 3,
+      "cluster_label": "POP-dominant",
+      "pca_x": -1.9622031507770414,
+      "pca_y": 0.33674607255043376
     },
     {
       "country": "new zealand",
       "iso_code": "NZ",
-      "cluster": 0,
+      "cluster": 3,
       "cluster_label": "POP-dominant",
-      "pca_x": 2.8426141983926843,
-      "pca_y": -0.4801111040431523
+      "pca_x": -2.2832523656119657,
+      "pca_y": 0.7713803947560017
+    },
+    {
+      "country": "fiji",
+      "iso_code": "FJ",
+      "cluster": 1,
+      "cluster_label": "K-POP-dominant",
+      "pca_x": 3.3058441525385702,
+      "pca_y": 0.5621668775113645
     }
   ],
   "cluster_labels": {
-    "1": "ELECTRONIC-dominant",
-    "2": "K-POP-dominant",
+    "2": "LATIN-dominant",
+    "4": "INDIE-dominant",
+    "1": "K-POP-dominant",
+    "3": "POP-dominant",
     "0": "POP-dominant",
-    "4": "LATIN-dominant",
-    "3": "REGGAE-dominant",
-    "5": "CLASSICAL-dominant"
+    "5": "JAZZ-dominant"
   },
   "n_clusters": 6,
-  "total_countries": 41,
+  "total_countries": 89,
   "source": "Deezer Chart + Last.fm Tags + K-Means Clustering",
   "source_url": "https://api.deezer.com"
 }

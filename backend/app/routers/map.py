@@ -18,28 +18,49 @@ from app.ai.gemini_service import analyze_country_insight
 router     = APIRouter()
 CACHE_FILE = "map_cache.json"
 
-# ── 40+ quốc gia (dùng ISO code cho Deezer, name cho Last.fm) ───────────────
+# ── ~80 quốc gia (ISO code cho Deezer, name cho Last.fm) ────────────────────
+# Backend tự skip nước có 0 tag sau khi fetch (xem `_build_country_tags`),
+# nên thêm thoải mái — nước không có data sẽ tự loại khỏi cluster.
 COUNTRY_MAP: dict[str, str] = {
-    # Asia
+    # ── Asia ────────────────────────────────────────────────────────────────
     "VN": "vietnam",       "JP": "japan",         "KR": "south korea",
     "TH": "thailand",      "ID": "indonesia",     "PH": "philippines",
     "IN": "india",         "TW": "taiwan",        "SG": "singapore",
-    "MY": "malaysia",      "CN": "china",
-    # Americas
+    "MY": "malaysia",      "CN": "china",         "HK": "hong kong",
+    "MM": "myanmar",       "KH": "cambodia",      "LA": "laos",
+    "BD": "bangladesh",    "PK": "pakistan",      "LK": "sri lanka",
+    "NP": "nepal",         "MN": "mongolia",      "KZ": "kazakhstan",
+    # ── Middle East ─────────────────────────────────────────────────────────
+    "AE": "united arab emirates", "SA": "saudi arabia", "IL": "israel",
+    "IR": "iran",          "IQ": "iraq",          "JO": "jordan",
+    "LB": "lebanon",
+    # ── Americas ────────────────────────────────────────────────────────────
     "US": "united states", "CA": "canada",        "BR": "brazil",
     "MX": "mexico",        "AR": "argentina",     "CO": "colombia",
-    "CL": "chile",         "PE": "peru",
-    # Europe
+    "CL": "chile",         "PE": "peru",          "VE": "venezuela",
+    "BO": "bolivia",       "EC": "ecuador",       "UY": "uruguay",
+    "PY": "paraguay",      "GT": "guatemala",     "CR": "costa rica",
+    "PA": "panama",        "PR": "puerto rico",   "DO": "dominican republic",
+    "JM": "jamaica",       "CU": "cuba",
+    # ── Europe ──────────────────────────────────────────────────────────────
     "GB": "united kingdom","FR": "france",        "DE": "germany",
     "ES": "spain",         "IT": "italy",         "NL": "netherlands",
     "SE": "sweden",        "NO": "norway",        "PL": "poland",
     "PT": "portugal",      "BE": "belgium",       "CH": "switzerland",
     "AT": "austria",       "DK": "denmark",       "FI": "finland",
-    "TR": "turkey",        "RU": "russia",
-    # Africa / Middle East
+    "TR": "turkey",        "RU": "russia",        "IE": "ireland",
+    "IS": "iceland",       "GR": "greece",        "CZ": "czech republic",
+    "HU": "hungary",       "RO": "romania",       "SK": "slovakia",
+    "HR": "croatia",       "BG": "bulgaria",      "RS": "serbia",
+    "UA": "ukraine",
+    # ── Africa ──────────────────────────────────────────────────────────────
     "NG": "nigeria",       "ZA": "south africa",  "EG": "egypt",
-    # Oceania
-    "AU": "australia",     "NZ": "new zealand",
+    "KE": "kenya",         "MA": "morocco",       "DZ": "algeria",
+    "TN": "tunisia",       "ET": "ethiopia",      "GH": "ghana",
+    "SN": "senegal",       "CI": "ivory coast",   "TZ": "tanzania",
+    "UG": "uganda",        "ZW": "zimbabwe",
+    # ── Oceania ─────────────────────────────────────────────────────────────
+    "AU": "australia",     "NZ": "new zealand",   "FJ": "fiji",
 }
 
 # Các genre bổ sung thủ công cho quốc gia có âm nhạc địa phương đặc thù
@@ -64,30 +85,31 @@ LOCAL_GENRE_BOOST: dict[str, list[str]] = {
 async def _build_country_tags(iso_code: str, country_name: str) -> list[str]:
     """
     Xây dựng danh sách genre tags cho 1 quốc gia.
-    Nguồn: Deezer Chart → artist tags từ Last.fm + Local boost
+    Nguồn: Deezer Chart (strict — không fallback global) → Last.fm + Local boost.
+    Nếu cả 2 đều rỗng, trả [] để cluster loop skip nước này.
     """
     tags: list[str] = []
 
-    # 1. Deezer chart → lấy nghệ sĩ → lấy tags từ Last.fm
-    deezer_tracks = await get_country_chart(iso_code, limit=10)
+    # 1. Deezer chart strict — chỉ chấp nhận editorial/playlist của nước này
+    deezer_tracks = await get_country_chart(iso_code, limit=10, strict=True)
     if deezer_tracks:
         for t in deezer_tracks[:6]:
             try:
                 artist_tags = await get_artist_tags(t["artist"])
                 tags.extend(artist_tags[:4])
-                await asyncio.sleep(0.05)
-            except:
+                await asyncio.sleep(0.03)
+            except Exception:
                 pass
-    
-    # 2. Fallback: Last.fm geo chart nếu Deezer không trả đủ
+
+    # 2. Fallback: Last.fm geo chart
     if len(tags) < 5:
         try:
             lf_tracks = await get_top_tracks_by_country(country_name, limit=5)
             for t in lf_tracks[:4]:
                 artist_tags = await get_artist_tags(t["artist"])
                 tags.extend(artist_tags[:3])
-                await asyncio.sleep(0.05)
-        except:
+                await asyncio.sleep(0.03)
+        except Exception:
             pass
 
     # 3. Local genre boost
@@ -119,14 +141,27 @@ async def get_country_clusters(
         print(f"⚡ Cache hit: {len(cached.get('data', []))} countries")
         return cached
 
-    # ── Cào dữ liệu ─────────────────────────────────────────────────────────
+    # ── Cào dữ liệu (parallel với semaphore để né rate-limit) ───────────────
     print(f"🐌 Bắt đầu cào {len(COUNTRY_MAP)} quốc gia...")
-    country_tags: dict[str, list[str]] = {}
+    sem = asyncio.Semaphore(8)  # tối đa 8 fetch đồng thời
 
-    for iso, name in COUNTRY_MAP.items():
-        tags = await _build_country_tags(iso, name)
-        country_tags[name] = tags
-        print(f"  ✓ {iso} ({name}): {len(tags)} tags")
+    async def fetch_one(iso: str, name: str) -> tuple[str, list[str]]:
+        async with sem:
+            tags = await _build_country_tags(iso, name)
+            print(f"  ✓ {iso} ({name}): {len(tags)} tags")
+            return name, tags
+
+    pairs = await asyncio.gather(
+        *(fetch_one(iso, name) for iso, name in COUNTRY_MAP.items()),
+        return_exceptions=False,
+    )
+    # Skip countries với 0 tag (Deezer + Last.fm đều rỗng)
+    country_tags: dict[str, list[str]] = {
+        name: tags for name, tags in pairs if tags and len(tags) >= 3
+    }
+    skipped = len(COUNTRY_MAP) - len(country_tags)
+    if skipped:
+        print(f"⏭️  Skip {skipped} nước không có data")
 
     # ── Clustering ───────────────────────────────────────────────────────────
     df            = build_country_vectors(country_tags)

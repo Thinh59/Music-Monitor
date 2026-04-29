@@ -69,6 +69,18 @@ function renderBlock(
     );
   }
   if (block.kind === "para") {
+    if (block.label) {
+      return (
+        <div key={idx} className="space-y-1">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-accent-purple">
+            {block.label}
+          </p>
+          <p className={`${baseText} text-text-secondary`}>
+            {renderInline(block.text, size)}
+          </p>
+        </div>
+      );
+    }
     return (
       <p key={idx} className={`${baseText} text-text-secondary`}>
         {renderInline(block.text, size)}

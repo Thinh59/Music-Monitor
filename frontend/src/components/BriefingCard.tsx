@@ -86,6 +86,18 @@ function renderBlock(block: SectionBlock, idx: number) {
     );
   }
   if (block.kind === "para") {
+    if (block.label) {
+      return (
+        <div key={idx} className="space-y-1">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-accent-purple">
+            {block.label}
+          </p>
+          <p className="text-sm leading-relaxed text-text-secondary">
+            {renderInline(block.text)}
+          </p>
+        </div>
+      );
+    }
     return (
       <p
         key={idx}

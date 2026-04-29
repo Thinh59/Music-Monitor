@@ -139,32 +139,42 @@ def _format_track(t: dict, source: str = "Deezer") -> dict:
 
 # ── Country Charts ────────────────────────────────────────────────────────────
 
-async def get_country_chart(iso_code: str, limit: int = 30) -> list[dict]:
+async def get_country_chart(
+    iso_code: str,
+    limit: int = 30,
+    strict: bool = False,
+) -> list[dict]:
     """
     Top tracks tại 1 quốc gia theo Deezer.
-    Thử theo thứ tự: editorial → playlist fallback → global chart
+    Thử: editorial → playlist fallback → global (chỉ khi strict=False).
+
+    `strict=True` dùng cho clustering — không fall-back global vì sẽ làm
+    nhiễu dữ liệu (nước nhỏ kết quả global → cluster sai).
     """
     iso = iso_code.upper()
 
-    # 1. Thử editorial chart (cách ổn định nhất)
+    # 1. Editorial chart
     ed_id = COUNTRY_EDITORIAL_IDS.get(iso)
     if ed_id:
-        data   = await _get(f"{BASE}/editorial/{ed_id}/charts")
+        data = await _get(f"{BASE}/editorial/{ed_id}/charts")
         tracks = data.get("tracks", {}).get("data", [])
         if tracks:
             return [_format_track(t, source=f"Deezer Chart {iso}") for t in tracks[:limit]]
 
-    # 2. Thử playlist fallback
+    # 2. Playlist fallback
     pl_id = COUNTRY_PLAYLIST_FALLBACK.get(iso)
     if pl_id:
-        data   = await _get(f"{BASE}/playlist/{pl_id}/tracks", {"limit": limit})
+        data = await _get(f"{BASE}/playlist/{pl_id}/tracks", {"limit": limit})
         tracks = data.get("data", [])
         if tracks:
             return [_format_track(t, source=f"Deezer Playlist {iso}") for t in tracks[:limit]]
 
-    # 3. Fallback sang global chart (chart/0)
+    if strict:
+        return []
+
+    # 3. Fallback global chart (cho endpoint /country/{iso}/top)
     print(f"⚠️ Deezer: không tìm được chart {iso}, dùng global chart")
-    data   = await _get(f"{BASE}/chart/0/tracks", {"limit": limit})
+    data = await _get(f"{BASE}/chart/0/tracks", {"limit": limit})
     tracks = data.get("data", [])
     return [_format_track(t, source="Deezer Global Fallback") for t in tracks[:limit]]
 

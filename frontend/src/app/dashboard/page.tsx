@@ -7,7 +7,6 @@ import {
   Sparkles,
   MonitorPlay,
   Flame,
-  Music2,
   AlertTriangle,
   TrendingUp,
 } from "lucide-react";
@@ -37,37 +36,14 @@ interface YouTubeVideo {
   growth_pct?: number;
 }
 
-interface SpotifyTrack {
-  name: string;
-  artist: string;
-  album?: string;
-  popularity: number;
-  preview_url?: string;
-  source: string;
-  source_url?: string;
-}
-
 interface DashboardState {
   globalCharts: Track[];
   youtubeVideos: YouTubeVideo[];
   redditPosts: TrendPost[];
   sentiment: SentimentResult | null;
-  spotifyTracks: SpotifyTrack[];
-  spotifyReason: string | null;
-  spotifyMessage: string | null;
-  spotifyFallback: boolean;
-  spotifySource: string | null;
   briefing: string;
   briefingDate: string;
 }
-
-const SPOTIFY_REASON_HINT: Record<string, string> = {
-  missing_env: "Chưa cấu hình SPOTIFY_CLIENT_ID/SPOTIFY_CLIENT_SECRET trong backend/.env",
-  invalid_credentials: "Credentials Spotify không hợp lệ — kiểm tra Client ID/Secret",
-  rate_limit: "Spotify đang rate-limit — thử lại sau ít phút",
-  premium_required:
-    "Playlist editorial (Top 50, Viral 50) yêu cầu owner Spotify App có Premium subscription",
-};
 
 export default function Dashboard() {
   const [state, setState] = useState<DashboardState>({
@@ -75,11 +51,6 @@ export default function Dashboard() {
     youtubeVideos: [],
     redditPosts: [],
     sentiment: null,
-    spotifyTracks: [],
-    spotifyReason: null,
-    spotifyMessage: null,
-    spotifyFallback: false,
-    spotifySource: null,
     briefing: "",
     briefingDate: "",
   });
@@ -129,17 +100,6 @@ export default function Dashboard() {
       }
 
       try {
-        const d = await apiFetch("/api/charts/spotify?limit=20");
-        updates.spotifyTracks = d.data ?? [];
-        updates.spotifyReason = d.reason ?? null;
-        updates.spotifyMessage = d.message ?? null;
-        updates.spotifyFallback = d.fallback === true;
-        updates.spotifySource = d.source ?? null;
-      } catch (e: any) {
-        errs.push(`Spotify: ${e.message}`);
-      }
-
-      try {
         const d = await apiFetch("/api/briefing/daily");
         updates.briefing = d.briefing ?? "";
         updates.briefingDate = d.generated_at ?? "";
@@ -166,7 +126,7 @@ export default function Dashboard() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-accent-purple mx-auto mb-3" />
           <p className="text-text-muted text-sm">
-            Đang tải dữ liệu từ Last.fm · YouTube · Reddit · Spotify...
+            Đang tải dữ liệu từ Last.fm · YouTube · Reddit...
           </p>
         </div>
       </div>
@@ -186,7 +146,7 @@ export default function Dashboard() {
               Music Intelligence <span className="gradient-text">Dashboard</span>
             </h1>
             <p className="text-text-secondary mt-1 text-sm">
-              Real-time · Last.fm · YouTube · Reddit · Spotify · Gemini AI
+              Real-time · Last.fm · YouTube · Reddit · Gemini AI
             </p>
           </div>
         </div>
@@ -431,86 +391,9 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Spotify */}
-        <div
-          data-testid="spotify-section"
-          className="bg-bg-card rounded-xl border border-border overflow-hidden"
-        >
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-            <h2 className="text-base font-semibold text-text-primary flex items-center gap-2">
-              <Music2 className="h-5 w-5 text-emerald-500" />
-              {state.spotifyFallback
-                ? "Spotify — New Releases (fallback)"
-                : "Spotify — Top Tracks"}
-            </h2>
-            <SourceBadge source="Spotify" sourceUrl="https://developer.spotify.com" />
-          </div>
-          {state.spotifyFallback && (
-            <div className="px-5 py-2 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-300 dark:border-amber-700/60 text-amber-800 dark:text-amber-300 text-xs flex items-start gap-2">
-              <AlertTriangle className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
-              <span>
-                {SPOTIFY_REASON_HINT.premium_required} Đang hiển thị New Releases thay thế.
-              </span>
-            </div>
-          )}
-          {state.spotifyTracks.length === 0 ? (
-            <div className="px-5 py-8 text-center text-text-muted text-sm">
-              <p className="mb-1 font-medium text-text-secondary">Spotify hiện không khả dụng</p>
-              <p className="text-xs">
-                {state.spotifyReason
-                  ? (SPOTIFY_REASON_HINT[state.spotifyReason] ?? state.spotifyMessage)
-                  : "Kiểm tra SPOTIFY_CLIENT_ID/SECRET trong backend/.env"}
-              </p>
-              {state.spotifyReason === "missing_env" && (
-                <a
-                  href="https://developer.spotify.com/dashboard"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-2 text-xs text-accent-purple hover:text-accent-blue underline"
-                >
-                  Lấy Client ID & Secret tại developer.spotify.com →
-                </a>
-              )}
-              {state.spotifyReason === "premium_required" && (
-                <p className="text-xs mt-2 text-text-muted">
-                  Hoặc đổi sang Spotify App khác (owner có Premium) hoặc dùng /browse/new-releases.
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-0 divide-x divide-border-subtle">
-              {state.spotifyTracks.slice(0, 20).map((t, i) => (
-                <div
-                  key={i}
-                  className="px-4 py-3 hover:bg-bg-elevated border-b border-border-subtle"
-                >
-                  <div className="flex items-start gap-2">
-                    <span className="text-xs font-bold text-text-muted mt-0.5 w-5 flex-shrink-0">
-                      {i + 1}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="text-xs font-medium text-text-primary truncate">{t.name}</p>
-                      <p className="text-xs text-text-muted truncate">{t.artist}</p>
-                      <div className="mt-1 flex items-center gap-1">
-                        <div className="h-1 flex-1 bg-bg-elevated rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-emerald-500 rounded-full"
-                            style={{ width: `${t.popularity}%` }}
-                          />
-                        </div>
-                        <span className="text-xs text-text-muted">{t.popularity}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
         <div className="text-xs text-text-muted text-center pb-4">
-          Dữ liệu tổng hợp từ Last.fm · YouTube Data API v3 · Reddit OAuth API · Spotify Web API ·
-          Phân tích bằng Gemini 3.1 Flash Lite
+          Dữ liệu tổng hợp từ Last.fm · YouTube Data API v3 · Reddit OAuth API · Phân tích bằng
+          Gemini 3.1 Flash Lite
         </div>
       </div>
     </main>

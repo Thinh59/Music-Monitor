@@ -1,60 +1,55 @@
 "use client";
 import { useState, useEffect } from "react";
+import { Target, Search, Rocket, Loader2, Play, Square, AlertTriangle, RefreshCw, Music2 } from "lucide-react";
 import SourceBadge from "@/components/SourceBadge";
 
 const BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
 interface Candidate {
-  name:            string;
-  artist:          string;
-  image?:          string;
-  preview?:        string;
+  name: string;
+  artist: string;
+  image?: string;
+  preview?: string;
   hit_probability: number;
-  prediction:      string;
-  confidence:      string;
-  source:          string;
-  source_url?:     string;
-  playcount?:      number;
+  prediction: string;
+  confidence: string;
+  source: string;
+  source_url?: string;
+  playcount?: number;
 }
 
 interface PredictResult {
-  track:           string;
-  artist:          string;
+  track: string;
+  artist: string;
   hit_probability: number;
-  prediction:      string;
-  confidence:      string;
-  metadata?:       { image?: string; preview?: string };
+  prediction: string;
+  confidence: string;
+  metadata?: { image?: string; preview?: string };
   data_collected?: any;
-  is_fallback?:    boolean;
+  is_fallback?: boolean;
 }
 
 const GRADIENT: Record<string, string> = {
-  "Potential Hit": "from-green-600 to-emerald-500",
-  "Watch":         "from-amber-500 to-orange-500",
-  "Normal":        "from-gray-600 to-gray-500",
-};
-const EMOJI: Record<string, string> = {
-  "Potential Hit": "🚀",
-  "Watch":         "👀",
-  "Normal":        "📻",
+  "Potential Hit": "from-emerald-500 to-teal-500",
+  "Watch": "from-amber-500 to-orange-500",
+  "Normal": "from-slate-500 to-slate-600",
 };
 
 export default function PredictPage() {
-  const [trackName,  setTrack]   = useState("");
-  const [artistName, setArtist]  = useState("");
-  const [result,     setResult]  = useState<PredictResult | null>(null);
-  const [candidates, setCands]   = useState<Candidate[]>([]);
-  const [loading,    setLoading] = useState(false);
-  const [candLoad,   setCandLoad]= useState(true);
-  const [error,      setError]   = useState<string | null>(null);
-  const [playing,    setPlaying] = useState<string | null>(null);  // preview audio
-  
-  // State gợi ý nghệ sĩ
-  const [artistSuggestions, setArtistSuggestions] = useState<Array<{id: number, name: string}>>([]);
+  const [trackName, setTrack] = useState("");
+  const [artistName, setArtist] = useState("");
+  const [result, setResult] = useState<PredictResult | null>(null);
+  const [candidates, setCands] = useState<Candidate[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [candLoad, setCandLoad] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [playing, setPlaying] = useState<string | null>(null);
+  const [artistSuggestions, setArtistSuggestions] = useState<Array<{ id: number; name: string }>>([]);
 
-  useEffect(() => { loadCandidates(); }, []);
+  useEffect(() => {
+    loadCandidates();
+  }, []);
 
-  // Fetch debounce cho gợi ý nghệ sĩ
   useEffect(() => {
     if (!artistName || artistName.length < 2) {
       setArtistSuggestions([]);
@@ -65,14 +60,13 @@ export default function PredictPage() {
         const res = await fetch(`${BASE}/api/prediction/artists/search?q=${encodeURIComponent(artistName)}`);
         const data = await res.json();
         if (data && data.data) setArtistSuggestions(data.data);
-      } catch (e) {
-        // Bỏ qua lỗi debounce này
+      } catch {
+        // ignore
       }
     }, 300);
     return () => clearTimeout(delay);
   }, [artistName]);
 
-  // ── Predict bài hát cụ thể ──────────────────────────────────────────────
   async function handlePredict() {
     if (!trackName && !artistName) return;
     setLoading(true);
@@ -80,23 +74,21 @@ export default function PredictPage() {
     setResult(null);
     try {
       const res = await fetch(`${BASE}/api/prediction/quick`, {
-        method:  "POST",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ track_name: trackName, artist_name: artistName }),
+        body: JSON.stringify({ track_name: trackName, artist_name: artistName }),
       });
       if (!res.ok) {
         const errorData = await res.json().catch(() => null);
         throw new Error(errorData?.detail || `Lỗi từ máy chủ (${res.status})`);
       }
-      
+
       const responseData = await res.json();
       setResult(responseData);
 
-      // Cập nhật kết quả tìm kiếm vào BXH để người dùng dễ theo dõi
       setCands((prev) => {
-        const exists = prev.some(c => c.name === responseData.track && c.artist === responseData.artist);
+        const exists = prev.some((c) => c.name === responseData.track && c.artist === responseData.artist);
         if (exists) return prev;
-
         const newCand: Candidate = {
           name: responseData.track,
           artist: responseData.artist,
@@ -105,24 +97,20 @@ export default function PredictPage() {
           hit_probability: responseData.hit_probability,
           prediction: responseData.prediction,
           confidence: responseData.confidence,
-          source: "Người dùng tìm kiếm 🔍",
+          source: "Người dùng tìm kiếm",
         };
-        const newList = [...prev, newCand];
-        // Sort giảm dần theo hit_probability
-        return newList.sort((a, b) => b.hit_probability - a.hit_probability);
+        return [...prev, newCand].sort((a, b) => b.hit_probability - a.hit_probability);
       });
-
     } catch (e: any) {
       setError(e.message);
-      // Chỉ hiện fallback UI nếu là các lỗi hệ thống không kiểm soát (chứ không phải 404 validation)
       if (!e.message.includes("Không tìm thấy")) {
         setResult({
-          track:           trackName,
-          artist:          artistName || "Unknown Artist",
+          track: trackName,
+          artist: artistName || "Unknown Artist",
           hit_probability: Math.round(50 + Math.random() * 35),
-          prediction:      "Watch",
-          confidence:      "Low",
-          is_fallback:     true,
+          prediction: "Watch",
+          confidence: "Low",
+          is_fallback: true,
         });
       }
     } finally {
@@ -130,7 +118,6 @@ export default function PredictPage() {
     }
   }
 
-  // ── Load danh sách ứng viên ─────────────────────────────────────────────
   async function loadCandidates() {
     setCandLoad(true);
     setError(null);
@@ -147,64 +134,68 @@ export default function PredictPage() {
     }
   }
 
-  // ── Preview audio ───────────────────────────────────────────────────────
   function togglePreview(url: string) {
-    if (playing === url) {
-      setPlaying(null);
-    } else {
-      setPlaying(url);
-    }
+    setPlaying(playing === url ? null : url);
   }
 
-  const pred     = result?.prediction ?? "Normal";
+  const pred = result?.prediction ?? "Normal";
   const gradient = GRADIENT[pred] ?? GRADIENT.Normal;
-  const emoji    = EMOJI[pred]    ?? "🎵";
 
   return (
-    <main className="min-h-screen bg-transparent p-6">
+    <main className="min-h-screen p-6">
       <div className="max-w-5xl mx-auto space-y-6">
-
-        {/* ── Header ── */}
-        <div>
-          <h1 className="text-2xl font-bold text-white">🎯 Hit Prediction</h1>
-          <p className="text-gray-400 text-sm mt-1">
-            Dự đoán bài hát lọt top chart · XGBoost ML + Deezer TikTok + YouTube
-          </p>
-          <div className="flex gap-2 mt-2">
-            <SourceBadge source="Deezer TikTok" sourceUrl="https://api.deezer.com" />
-            <SourceBadge source="YouTube" />
-            <SourceBadge source="Reddit" />
-            <SourceBadge source="Last.fm" />
+        {/* Header */}
+        <div className="flex items-start gap-3">
+          <div className="h-12 w-12 rounded-xl bg-gradient-aurora flex items-center justify-center shadow-glow">
+            <Target className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-text-primary">
+              Hit <span className="gradient-text">Prediction</span>
+            </h1>
+            <p className="text-text-secondary text-sm mt-1">
+              Dự đoán bài hát lọt top chart · XGBoost ML + Deezer TikTok + YouTube
+            </p>
+            <div className="flex gap-2 mt-2">
+              <SourceBadge source="Deezer TikTok" sourceUrl="https://api.deezer.com" />
+              <SourceBadge source="YouTube" />
+              <SourceBadge source="Reddit" />
+              <SourceBadge source="Last.fm" />
+            </div>
           </div>
         </div>
 
-        {/* ── Error ── */}
+        {/* Error */}
         {error && (
-          <div className="bg-yellow-950/60 border border-yellow-700 text-yellow-300 text-sm px-4 py-3 rounded-xl">
-            ⚠️ {error}
+          <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 text-amber-800 dark:text-amber-300 text-sm px-4 py-3 rounded-xl">
+            <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+            <span>{error}</span>
           </div>
         )}
 
-        {/* ── Search Form ── */}
-        <div className="bg-[#1a1b1e] rounded-xl border border-gray-800 p-6">
-          <h2 className="font-semibold text-white mb-4">🔍 Dự đoán bài hát cụ thể</h2>
+        {/* Search */}
+        <div className="bg-bg-card rounded-2xl border border-border p-6 shadow-card">
+          <h2 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
+            <Search className="h-4 w-4 text-accent-purple" />
+            Dự đoán bài hát cụ thể
+          </h2>
           <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
               placeholder="Tên bài hát / Từ khóa..."
               value={trackName}
               onChange={(e) => setTrack(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && (!trackName && !artistName ? undefined : handlePredict())}
-              className="flex-1 bg-[#121212] border border-gray-700 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition"
+              onKeyDown={(e) => e.key === "Enter" && (trackName || artistName) && handlePredict()}
+              className="flex-1 bg-bg-elevated border border-border text-text-primary placeholder:text-text-muted rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-accent-purple/50"
             />
             <input
               type="text"
-              placeholder="Nghệ sĩ (Tùy chọn)..."
+              placeholder="Nghệ sĩ (tùy chọn)..."
               value={artistName}
               list="artist-suggestions"
               onChange={(e) => setArtist(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && (!trackName && !artistName ? undefined : handlePredict())}
-              className="flex-1 bg-[#121212] border border-gray-700 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition"
+              onKeyDown={(e) => e.key === "Enter" && (trackName || artistName) && handlePredict()}
+              className="flex-1 bg-bg-elevated border border-border text-text-primary placeholder:text-text-muted rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-accent-purple/50"
             />
             <datalist id="artist-suggestions">
               {artistSuggestions.map((a) => (
@@ -214,16 +205,16 @@ export default function PredictPage() {
             <button
               onClick={handlePredict}
               disabled={loading || (!trackName && !artistName)}
-              className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-600
-                         text-white px-8 py-2.5 rounded-lg text-sm font-medium transition-colors"
+              className="bg-gradient-aurora text-white font-semibold px-6 py-2.5 rounded-lg text-sm disabled:opacity-50 flex items-center gap-2 justify-center"
             >
-              {loading ? "⏳ Đang phân tích..." : "🚀 Dự đoán"}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
+              {loading ? "Đang phân tích..." : "Dự đoán"}
             </button>
           </div>
 
           {/* Result Card */}
           {result && (
-            <div className={`mt-5 rounded-xl overflow-hidden border border-gray-700 ${result.is_fallback ? "opacity-80" : ""}`}>
+            <div className={`mt-5 rounded-xl overflow-hidden border border-border ${result.is_fallback ? "opacity-80" : ""}`}>
               <div className={`bg-gradient-to-r ${gradient} p-5 flex items-start gap-4`}>
                 {result.metadata?.image && (
                   <img
@@ -233,22 +224,18 @@ export default function PredictPage() {
                   />
                 )}
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">{emoji}</span>
-                    <span className="text-xl font-bold text-white">{result.track}</span>
-                  </div>
-                  <p className="text-white/70 text-sm">{result.artist}</p>
+                  <span className="text-xl font-bold text-white block">{result.track}</span>
+                  <p className="text-white/75 text-sm">{result.artist}</p>
                   <div className="mt-2 flex items-baseline gap-2">
                     <span className="text-4xl font-black text-white">{result.hit_probability}%</span>
-                    <span className="text-white/80 text-sm">{result.prediction}</span>
-                    <span className="text-white/60 text-xs">· {result.confidence} confidence</span>
+                    <span className="text-white/85 text-sm font-medium">{result.prediction}</span>
+                    <span className="text-white/65 text-xs">· {result.confidence} confidence</span>
                   </div>
                 </div>
               </div>
 
-              {/* Progress bar */}
-              <div className="bg-[#121212] px-5 py-3">
-                <div className="w-full bg-gray-800 rounded-full h-2">
+              <div className="bg-bg-elevated px-5 py-3">
+                <div className="w-full bg-bg-secondary rounded-full h-2">
                   <div
                     className={`h-2 rounded-full bg-gradient-to-r ${gradient} transition-all duration-700`}
                     style={{ width: `${result.hit_probability}%` }}
@@ -257,21 +244,24 @@ export default function PredictPage() {
                 {result.metadata?.preview && (
                   <button
                     onClick={() => togglePreview(result.metadata!.preview!)}
-                    className="mt-3 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                    className="mt-3 text-xs text-accent-purple hover:text-accent-blue inline-flex items-center gap-1.5"
                   >
-                    {playing === result.metadata.preview ? "⏹ Dừng preview" : "▶️ Nghe preview 30s (Deezer)"}
+                    {playing === result.metadata.preview ? (
+                      <>
+                        <Square className="h-3 w-3" /> Dừng preview
+                      </>
+                    ) : (
+                      <>
+                        <Play className="h-3 w-3" /> Nghe preview 30s (Deezer)
+                      </>
+                    )}
                   </button>
                 )}
                 {playing === result.metadata?.preview && (
-                  <audio
-                    src={playing}
-                    autoPlay
-                    onEnded={() => setPlaying(null)}
-                    className="hidden"
-                  />
+                  <audio src={playing} autoPlay onEnded={() => setPlaying(null)} className="hidden" />
                 )}
                 {result.is_fallback && (
-                  <p className="text-yellow-600 text-xs mt-2">
+                  <p className="text-amber-600 dark:text-amber-400 text-xs mt-2">
                     * Kết quả ước tính — backend chưa phản hồi
                   </p>
                 )}
@@ -280,76 +270,74 @@ export default function PredictPage() {
           )}
         </div>
 
-        {/* ── Potential Hits List ── */}
+        {/* Potential Hits */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white">
-              📋 Potential Hits Tuần Tới
-              <span className="text-gray-500 text-sm font-normal ml-2">
+            <h2 className="text-lg font-semibold text-text-primary flex items-center gap-2">
+              <Rocket className="h-5 w-5 text-accent-purple" />
+              Potential Hits Tuần Tới
+              <span className="text-text-muted text-sm font-normal ml-1">
                 — Deezer TikTok Viral + Global Chart
               </span>
             </h2>
             <button
               onClick={loadCandidates}
               disabled={candLoad}
-              className="text-sm text-indigo-400 hover:text-indigo-300 disabled:opacity-50 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg transition"
+              className="text-sm text-text-secondary hover:text-text-primary bg-bg-card border border-border hover:border-accent-purple/40 px-3 py-1.5 rounded-lg flex items-center gap-1.5 disabled:opacity-50"
             >
-              {candLoad ? "⏳ Đang cào..." : "🔄 Tải lại"}
+              <RefreshCw className={`h-3.5 w-3.5 ${candLoad ? "animate-spin" : ""}`} />
+              Tải lại
             </button>
           </div>
 
           {candLoad ? (
-            <div className="bg-[#1a1b1e] border border-gray-800 rounded-xl p-10 text-center">
-              <p className="text-gray-400 animate-pulse text-sm">
-                🤖 Đang phân tích Deezer TikTok Viral + Last.fm với mô hình XGBoost...
+            <div className="bg-bg-card border border-border rounded-2xl p-10 text-center">
+              <p className="text-text-muted animate-pulse text-sm">
+                Đang phân tích Deezer TikTok Viral + Last.fm với mô hình XGBoost...
               </p>
             </div>
           ) : candidates.length === 0 ? (
-            <div className="bg-[#1a1b1e] border border-gray-800 rounded-xl p-10 text-center text-gray-500 text-sm">
+            <div className="bg-bg-card border border-border rounded-2xl p-10 text-center text-text-muted text-sm">
               Không có dữ liệu. Kiểm tra backend logs.
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-2">
               {candidates.map((c, i) => {
-                const g   = GRADIENT[c.prediction] ?? GRADIENT.Normal;
-                const em  = EMOJI[c.prediction]    ?? "🎵";
+                const g = GRADIENT[c.prediction] ?? GRADIENT.Normal;
                 const pct = c.hit_probability;
                 return (
                   <div
                     key={`${c.name}-${i}`}
-                    className="bg-[#1a1b1e] border border-gray-800 rounded-xl p-4 flex items-center gap-4
-                               hover:border-gray-700 transition-colors"
+                    className="bg-bg-card border border-border rounded-xl p-4 flex items-center gap-4 hover:border-accent-purple/40"
                   >
-                    {/* Rank */}
-                    <span className="text-xl font-black text-gray-700 w-7 text-center flex-shrink-0">
+                    <span className="text-xl font-black text-text-muted w-7 text-center flex-shrink-0">
                       {i + 1}
                     </span>
 
-                    {/* Album art */}
                     {c.image ? (
                       <img
                         src={c.image}
                         alt={c.name}
-                        className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-gray-800"
+                        className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-bg-elevated"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center text-xl flex-shrink-0">
-                        🎵
+                      <div className="w-12 h-12 rounded-lg bg-bg-elevated flex items-center justify-center flex-shrink-0">
+                        <Music2 className="h-5 w-5 text-text-muted" />
                       </div>
                     )}
 
-                    {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-white truncate text-sm">{c.name}</p>
-                      <p className="text-xs text-gray-500 truncate">{c.artist}</p>
+                      <p className="font-semibold text-text-primary truncate text-sm">{c.name}</p>
+                      <p className="text-xs text-text-muted truncate">{c.artist}</p>
                       <div className="mt-1 flex items-center gap-2">
                         <SourceBadge source={c.source} sourceUrl={c.source_url} />
                         {c.preview && (
                           <button
                             onClick={() => togglePreview(c.preview!)}
-                            className="text-xs text-indigo-500 hover:text-indigo-400 transition"
+                            className="text-xs text-accent-purple hover:text-accent-blue"
+                            aria-label={playing === c.preview ? "Stop" : "Play"}
                           >
-                            {playing === c.preview ? "⏹" : "▶️"}
+                            {playing === c.preview ? <Square className="h-3 w-3" /> : <Play className="h-3 w-3" />}
                           </button>
                         )}
                         {playing === c.preview && (
@@ -358,13 +346,11 @@ export default function PredictPage() {
                       </div>
                     </div>
 
-                    {/* Hit Score */}
                     <div className="flex-shrink-0 text-right">
                       <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r ${g} text-white text-sm font-bold`}>
-                        <span>{em}</span>
                         <span>{pct}%</span>
                       </div>
-                      <p className="text-xs text-gray-600 mt-1">{c.confidence} confidence</p>
+                      <p className="text-xs text-text-muted mt-1">{c.confidence} confidence</p>
                     </div>
                   </div>
                 );
@@ -372,7 +358,6 @@ export default function PredictPage() {
             </div>
           )}
         </div>
-
       </div>
     </main>
   );

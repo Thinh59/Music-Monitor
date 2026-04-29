@@ -106,22 +106,22 @@ export default function ViralHeatmap({ tracks }: { tracks: TikTokTrack[] }) {
                       {rank}
                     </span>
                   </div>
-                  <div className="flex-1 min-w-0 relative">
-                    <div className="relative h-7 rounded-md overflow-hidden bg-bg-elevated">
-                      <div
-                        className={`absolute inset-y-0 left-0 bg-gradient-to-r ${tier} opacity-80 group-hover:opacity-100 transition-opacity`}
-                        style={{ width: `${width}%` }}
-                      />
-                      <div className="relative px-2.5 h-full flex items-center justify-between gap-2 z-10">
-                        <span className="text-xs font-semibold text-white truncate drop-shadow">
-                          {t.name}
-                        </span>
-                        <span className="text-[10px] font-medium text-white/85 truncate flex-shrink-0 drop-shadow">
-                          {t.artist}
-                        </span>
-                      </div>
+                  {/* Bar (track name inside) */}
+                  <div className="relative h-7 rounded-md overflow-hidden bg-bg-elevated flex-1 min-w-0 max-w-[55%]">
+                    <div
+                      className={`absolute inset-y-0 left-0 bg-gradient-to-r ${tier} opacity-85 group-hover:opacity-100 transition-opacity`}
+                      style={{ width: `${width}%` }}
+                    />
+                    <div className="relative px-2.5 h-full flex items-center z-10">
+                      <span className="text-xs font-semibold text-white truncate drop-shadow-sm">
+                        {t.name}
+                      </span>
                     </div>
                   </div>
+                  {/* Artist (theme-aware text, outside bar) */}
+                  <span className="text-[11px] text-text-muted truncate flex-1 min-w-0">
+                    {t.artist}
+                  </span>
                 </motion.div>
               );
             })}

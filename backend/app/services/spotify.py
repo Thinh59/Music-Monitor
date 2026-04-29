@@ -53,9 +53,40 @@ def _wrap_call(fn):
                     "invalid_credentials",
                     "Spotify trả 401 — kiểm tra Client ID/Secret.",
                 )
+            if e.http_status == 403 and "premium" in str(e).lower():
+                # Editorial playlists (Top 50, Viral 50) yêu cầu owner app có Premium
+                raise SpotifyConfigError(
+                    "premium_required",
+                    "Playlist editorial Spotify yêu cầu owner của Spotify App có Premium subscription.",
+                )
             raise
 
     return wrapper
+
+
+@_wrap_call
+async def get_new_releases(limit: int = 20, country: str = "US") -> list[dict]:
+    """New album releases — không cần Premium owner.
+
+    Dùng làm fallback khi /v1/playlists yêu cầu Premium.
+    """
+    sp = _get_spotify_client()
+    results = sp.new_releases(limit=limit, country=country)
+    albums = results.get("albums", {}).get("items", [])
+    out: list[dict] = []
+    for a in albums:
+        artists = a.get("artists", [])
+        out.append({
+            "name": a.get("name", ""),
+            "artist": artists[0]["name"] if artists else "",
+            "album": a.get("name", ""),
+            "release_date": a.get("release_date", ""),
+            "popularity": 0,  # new-releases không có popularity
+            "spotify_id": a.get("id"),
+            "source": "Spotify New Releases",
+            "source_url": a.get("external_urls", {}).get("spotify"),
+        })
+    return out
 
 
 @_wrap_call

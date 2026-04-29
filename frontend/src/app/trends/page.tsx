@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Flame, Music2, MessageSquare, Bot, Sparkles, Play, Square, Loader2 } from "lucide-react";
 import SourceBadge from "@/components/SourceBadge";
+import RichText from "@/components/RichText";
 
 const BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
@@ -308,9 +309,7 @@ export default function TrendsPage() {
                       </button>
                     </div>
                     {aiInsight ? (
-                      <div className="text-xs text-text-secondary leading-relaxed whitespace-pre-wrap">
-                        {aiInsight}
-                      </div>
+                      <RichText text={aiInsight} size="sm" />
                     ) : (
                       <p className="text-xs text-text-muted italic">
                         Click "Phân tích" để Gemini phân tích xu hướng này

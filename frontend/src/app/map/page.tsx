@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { Globe2, Loader2, RefreshCw, Music2, AlertTriangle, Bot, Sparkles } from "lucide-react";
 import SourceBadge from "@/components/SourceBadge";
+import RichText from "@/components/RichText";
 import type { ClusterCountry, Track } from "@/types";
 
 const WorldMap = dynamic(() => import("@/components/WorldMap"), {
@@ -270,9 +271,7 @@ export default function MapPage() {
                       ))}
                     </div>
                   ) : aiInsight ? (
-                    <div className="text-xs text-text-secondary leading-relaxed whitespace-pre-wrap">
-                      {aiInsight}
-                    </div>
+                    <RichText text={aiInsight} size="sm" />
                   ) : (
                     <p className="text-xs text-text-muted italic">
                       Insight sẽ xuất hiện sau khi click quốc gia

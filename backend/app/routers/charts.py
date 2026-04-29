@@ -17,7 +17,7 @@
 
 from fastapi import APIRouter, Query
 from app.services.lastfm import get_global_top_tracks, get_top_tracks_by_country
-from app.services.spotify import get_playlist_tracks, SpotifyConfigError
+from app.services.spotify import get_playlist_tracks, get_new_releases, SpotifyConfigError
 
 router = APIRouter()
 
@@ -62,6 +62,7 @@ _REASON_MESSAGES = {
     "missing_env": "Cần SPOTIFY_CLIENT_ID và SPOTIFY_CLIENT_SECRET trong backend/.env",
     "invalid_credentials": "Credentials Spotify không hợp lệ — kiểm tra lại Client ID/Secret",
     "rate_limit": "Spotify đang rate-limit — thử lại sau ít phút",
+    "premium_required": "Playlist editorial (Top 50, Viral 50) yêu cầu owner Spotify App có Premium. Đang dùng New Releases làm fallback.",
 }
 
 
@@ -77,7 +78,10 @@ def _spotify_error_payload(err: Exception) -> dict:
 
 @router.get("/spotify")
 async def spotify_top_charts(limit: int = Query(50, le=50)):
-    """Top tracks từ Spotify Global Top 50 playlist."""
+    """Top tracks từ Spotify Global Top 50 playlist.
+
+    Nếu Spotify trả 403 Premium-required, tự fallback sang /browse/new-releases.
+    """
     try:
         tracks = await get_playlist_tracks(SPOTIFY_GLOBAL_TOP50_ID)
         return {
@@ -87,13 +91,28 @@ async def spotify_top_charts(limit: int = Query(50, le=50)):
             "source":      "Spotify Global Top 50",
             "source_url":  f"https://open.spotify.com/playlist/{SPOTIFY_GLOBAL_TOP50_ID}",
         }
+    except SpotifyConfigError as e:
+        if e.reason == "premium_required":
+            try:
+                tracks = await get_new_releases(limit=limit)
+                return {
+                    "data":        tracks,
+                    "total":       len(tracks),
+                    "source":      "Spotify New Releases (fallback)",
+                    "source_url":  "https://open.spotify.com/genre/new-releases",
+                    "fallback":    True,
+                    "fallback_reason": _REASON_MESSAGES["premium_required"],
+                }
+            except Exception as inner:
+                return _spotify_error_payload(inner)
+        return _spotify_error_payload(e)
     except Exception as e:
         return _spotify_error_payload(e)
 
 
 @router.get("/spotify/viral")
 async def spotify_viral_charts():
-    """Spotify Viral 50 Global."""
+    """Spotify Viral 50 Global. Fallback sang New Releases nếu cần Premium."""
     try:
         tracks = await get_playlist_tracks(SPOTIFY_VIRAL50_ID)
         return {
@@ -101,5 +120,18 @@ async def spotify_viral_charts():
             "source":     "Spotify Viral 50 Global",
             "source_url": f"https://open.spotify.com/playlist/{SPOTIFY_VIRAL50_ID}",
         }
+    except SpotifyConfigError as e:
+        if e.reason == "premium_required":
+            try:
+                tracks = await get_new_releases(limit=20)
+                return {
+                    "data":     tracks,
+                    "source":   "Spotify New Releases (fallback)",
+                    "fallback": True,
+                    "fallback_reason": _REASON_MESSAGES["premium_required"],
+                }
+            except Exception as inner:
+                return _spotify_error_payload(inner)
+        return _spotify_error_payload(e)
     except Exception as e:
         return _spotify_error_payload(e)

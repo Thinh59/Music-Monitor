@@ -58,3 +58,7 @@ testsprite_tests/
 # Runtime caches
 *.cache
 backend/.cache
+
+# Scratch files
+run.txt
+API.txt

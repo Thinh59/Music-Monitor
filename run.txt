@@ -1,9 +1,0 @@
-cd backend
-backend\venv\Scripts\activate
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-
-cd frontend
-npm run dev
-
-http://localhost:3000
-http://localhost:8000/docs

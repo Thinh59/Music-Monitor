@@ -13,6 +13,7 @@ import {
 import SourceBadge from "@/components/SourceBadge";
 import TrendChart from "@/components/TrendChart";
 import RichText from "@/components/RichText";
+import LiveAlerts from "@/components/LiveAlerts";
 import type { Track, TrendPost, SentimentResult } from "@/types";
 
 const BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
@@ -164,6 +165,9 @@ export default function Dashboard() {
             ))}
           </div>
         )}
+
+        {/* Real-time Viral Alert System */}
+        <LiveAlerts youtubeVideos={state.youtubeVideos} redditPosts={state.redditPosts} />
 
         {/* Row 1 */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">

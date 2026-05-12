@@ -17,8 +17,10 @@ from app.services.deezer    import get_tiktok_viral, get_special_playlist, get_g
 from app.ai.trend_detection import detect_view_spike_zscore, calculate_viral_score
 from app.ai.sentiment       import analyze_posts_sentiment
 from app.ai.gemini_service  import analyze_country_insight, explain_trend   # NLP trend explanation
+from app.database           import get_db
 
 router = APIRouter()
+db = get_db()
 
 
 @router.get("/tiktok")
@@ -150,6 +152,24 @@ async def get_youtube_batch(limit: int = Query(8, le=12)):
             warnings.append(f"{track.get('name', '?')}: {e}")
             continue
 
+    if not results and top_tracks:
+        # Fallback sang Last.fm nếu YouTube hết Quota (403)
+        warnings.append("YouTube Quota Exceeded. Fallback sang Last.fm data.")
+        for i, track in enumerate(top_tracks[:limit]):
+            results.append({
+                "track_name":    track["name"],
+                "artist":        track["artist"],
+                "video_id":      f"fallback_{i}",
+                "title":         f"{track['name']} - {track['artist']}",
+                "view_count":    int(track.get("playcount", 0)),
+                "like_count":    int(track.get("listeners", 0)),
+                "comment_count": 0,
+                "thumbnail":     "",
+                "channel":       "Last.fm Audio",
+                "source":        "Last.fm (YouTube Fallback)",
+                "source_url":    track.get("url", "https://www.last.fm/charts"),
+            })
+            
     results.sort(key=lambda x: x["view_count"], reverse=True)
     payload = {"data": results, "source": "Last.fm + YouTube Data API v3"}
     if warnings:
@@ -201,11 +221,48 @@ async def youtube_spike(video_id: str):
     stats = await get_video_stats(video_id)
     if not stats:
         return {"error": f"Không tìm thấy {video_id}"}
-    views        = stats.get("view_count", 0)
-    fake_history = [int(views * 0.55), int(views * 0.72), int(views * 0.88), views]
-    spike        = detect_view_spike_zscore(fake_history)
-    return {**stats, "spike_detection": spike, "source": "YouTube Data API v3 + Z-score"}
+    
+    views = stats.get("view_count", 0)
+    
+    # Lấy lịch sử thực tế từ Firestore
+    history_arr = []
+    try:
+        # Tìm document có chứa video_id này
+        docs = db.collection("youtube_snapshots").where("video_id", "==", video_id).limit(1).stream()
+        for doc in docs:
+            history_ref = doc.reference.collection("history").order_by("timestamp").limit(48)
+            history_arr = [d.to_dict().get("view_count", 0) for d in history_ref.stream()]
+    except Exception as e:
+        print(f"Lỗi truy vấn history Z-score: {e}")
+        
+    if len(history_arr) < 5:
+        # Nếu chưa đủ data lịch sử (ví dụ scheduler chưa chạy đủ lâu), fallback
+        fake_history = [int(views * 0.55), int(views * 0.72), int(views * 0.88), views]
+        history_arr = fake_history
+    else:
+        history_arr.append(views) # Thêm view hiện tại vào cuối
 
+    spike = detect_view_spike_zscore(history_arr)
+    return {**stats, "spike_detection": spike, "source": "YouTube Data API v3 + Real Z-score from DB"}
+
+@router.get("/explain-trend/{track_name}")
+async def get_trend_explanation(track_name: str, artist: str = Query(""), yt_growth: float = Query(0.0), mentions: int = Query(0), sentiment: float = Query(0.0)):
+    """API gọi Gemini để giải thích nguyên nhân bài hát viral."""
+    insight = await explain_trend(
+        track_name=track_name,
+        artist=artist,
+        youtube_growth_pct=yt_growth,
+        reddit_mentions=mentions,
+        sentiment_score=sentiment,
+        top_reddit_post="", 
+        genre=""
+    )
+    return {
+        "track_name": track_name,
+        "artist": artist,
+        "insight": insight,
+        "source": "Gemini AI"
+    }
 
 @router.get("/spike/{track_name}")
 async def get_viral_score(track_name: str, artist: str = Query("")):

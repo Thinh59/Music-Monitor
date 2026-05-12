@@ -130,7 +130,7 @@ async def explain_trend(
 ) -> str:
     """Giải thích tại sao 1 bài hát đang viral."""
     cache_key = f"trend:{track_name}:{artist}"
-    prompt = f"""Bài hát "{track_name}" của {artist} đang viral. Hãy giải thích ngắn gọn (2-3 câu tiếng Việt) tại sao:
+    prompt = f"""Bài hát "{track_name}" của {artist} đang viral. Hãy giải thích ngắn gọn (2-3 câu tiếng Việt có dấu, chuẩn chính tả) tại sao:
 - YouTube growth 24h: {youtube_growth_pct:.1f}%
 - Reddit mentions: {reddit_mentions} posts
 - Sentiment score: {sentiment_score:.2f}

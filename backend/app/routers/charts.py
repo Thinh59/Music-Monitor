@@ -28,16 +28,34 @@ SPOTIFY_VIRAL50_ID = "37i9dQZEVXbLiRSasKsNU9"
 
 
 @router.get("/global")
-async def global_top_charts(limit: int = Query(50, le=200)):
+async def global_top_charts(limit: int = Query(50, le=200), period: str = Query("today")):
     """
     Top tracks toàn cầu từ Last.fm.
-    Nguồn: Last.fm chart.getTopTracks
+    Lưu ý: Vì Database (Firestore) mới lập hôm nay nên chưa có lịch sử thật của Tuần/Tháng trước.
+    Nên ở đây nhóm dùng thuật toán xáo trộn nhẹ để demo UI (Mock data). Sau 3 tháng thu thập đủ, chỉ cần query Firestore là xong.
     """
+    import random
     tracks = await get_global_top_tracks(limit=limit)
+    
+    if period == "week":
+        # Giả lập data tuần trước
+        tracks = random.sample(tracks, len(tracks))
+        for t in tracks:
+            t["playcount"] = int(int(t.get("playcount", 0)) * random.uniform(1.5, 3.0))
+    elif period == "month":
+        # Giả lập data tháng trước
+        tracks = random.sample(tracks, len(tracks))
+        for t in tracks:
+            t["playcount"] = int(int(t.get("playcount", 0)) * random.uniform(4.0, 8.0))
+            
+    # Re-sort theo playcount sau khi giả lập
+    tracks.sort(key=lambda x: int(x.get("playcount", 0)), reverse=True)
+
     return {
         "data":       tracks,
         "total":      len(tracks),
-        "source":     "Last.fm chart.getTopTracks",
+        "period":     period,
+        "source":     f"Last.fm chart.getTopTracks + Mock for {period}",
         "source_url": "https://www.last.fm/charts",
     }
 
@@ -135,3 +153,17 @@ async def spotify_viral_charts():
         return _spotify_error_payload(e)
     except Exception as e:
         return _spotify_error_payload(e)
+
+from fastapi import BackgroundTasks
+
+@router.get("/force-sync")
+async def force_sync_database(background_tasks: BackgroundTasks):
+    """Ép scheduler chạy ngay lập tức để lấy data mẫu lưu vào Firebase."""
+    print("DEBUG: Force-sync endpoint HIT!")
+    from app.scheduler import poll_lastfm_charts, poll_youtube_stats
+    import asyncio
+    # Chạy bằng BackgroundTasks của FastAPI để đảm bảo task không bị hủy giữa chừng
+    print("DEBUG: Scheduling background tasks...")
+    background_tasks.add_task(poll_lastfm_charts)
+    background_tasks.add_task(poll_youtube_stats)
+    return {"message": "Đã ra lệnh ép chạy Scheduler qua BackgroundTasks. Hãy kiểm tra Firebase sau 10 giây!"}

@@ -64,6 +64,33 @@ async def genre_distribution(top_n_artists: int = Query(20, le=50)):
     return payload
 
 
+@router.get("/market-summary")
+async def market_summary():
+    """Gemini phân tích tổng quan thị trường."""
+    from app.ai.gemini_service import analyze_country_insight
+    from datetime import date
+    
+    # Giả lập gom một số insight nổi bật để gửi cho Gemini (có thể nâng cấp gom data thật sau)
+    prompt = """Bạn là chuyên gia phân tích dữ liệu âm nhạc toàn cầu.
+Dựa trên các xu hướng hiện tại của YouTube, TikTok và Last.fm, hãy viết một báo cáo Market Intelligence Summary cực kỳ chuyên nghiệp (tiếng Việt, khoảng 200 từ).
+
+Định dạng trả về BẮT BUỘC phải theo đúng format này, mỗi mục nằm trên 1 dòng bắt đầu bằng Tên mục và dấu hai chấm:
+
+Tổng quan thị trường: (Viết 2-3 câu về xu hướng chung)
+Nền tảng dẫn dắt: (Phân tích vai trò của TikTok/Shorts trong việc tạo hit)
+Dự báo ngắn hạn: (Dự đoán thể loại nào sẽ bùng nổ trong 1-2 tháng tới)
+Khuyến nghị chiến lược: (1 lời khuyên cho các hãng thu âm/nghệ sĩ)
+
+BẮT BUỘC TUÂN THỦ ĐỊNH DẠNG TRÊN, KHÔNG DÙNG MARKDOWN, KHÔNG DÙNG IN ĐẬM HAY IN NGHIÊNG.
+"""
+    insight = await analyze_country_insight(prompt, cache_key=f"market_summary_{date.today()}")
+    return {
+        "insight": insight,
+        "generated_date": str(date.today()),
+        "source": "Gemini AI"
+    }
+
+
 @router.get("/genre-comparison")
 async def genre_comparison(
     countries: str = Query("VN,JP,US,KR,BR,NG", description="ISO codes, comma-separated")

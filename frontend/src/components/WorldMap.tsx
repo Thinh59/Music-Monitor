@@ -61,8 +61,11 @@ export default function WorldMap({ clusters, onCountryClick }: WorldMapProps) {
         const map = L.map("world-map", {
           center: [20, 0],
           zoom: 2,
+          minZoom: 2,
           scrollWheelZoom: false,
           attributionControl: true,
+          maxBounds: [[-90, -180], [90, 180]],
+          maxBoundsViscosity: 1.0
         });
         tileLayerRef.current = L.tileLayer(tileUrl, {
           attribution: "&copy; OpenStreetMap &copy; CARTO",

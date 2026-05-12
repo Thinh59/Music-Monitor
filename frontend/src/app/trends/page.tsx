@@ -6,14 +6,17 @@ import RichText from "@/components/RichText";
 
 const BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
-interface TikTokTrack {
-  name: string;
-  artist: string;
-  image?: string;
-  preview?: string;
-  deezer_id?: string;
+interface YouTubeVideo {
+  video_id: string;
+  title: string;
+  view_count: number;
+  like_count: number;
+  comment_count: number;
+  channel?: string;
+  thumbnail?: string;
   source: string;
-  source_url?: string;
+  source_url: string;
+  growth_pct?: number;
 }
 interface RedditPost {
   title: string;
@@ -32,24 +35,23 @@ interface Sentiment {
 const SUBREDDITS = ["Music", "hiphopheads", "kpop", "popheads", "indieheads", "Rnb"];
 
 export default function TrendsPage() {
-  const [tiktokTracks, setTiktok] = useState<TikTokTrack[]>([]);
+  const [youtubeVideos, setYoutube] = useState<YouTubeVideo[]>([]);
   const [redditPosts, setReddit] = useState<RedditPost[]>([]);
   const [sentiment, setSentiment] = useState<Sentiment | null>(null);
   const [mentions, setMentions] = useState(0);
   const [subreddit, setSubreddit] = useState("Music");
   const [selectedPost, setSelected] = useState<RedditPost | null>(null);
   const [aiInsight, setAiInsight] = useState("");
-  const [loadTiktok, setLoadTiktok] = useState(true);
+  const [loadYoutube, setLoadYoutube] = useState(true);
   const [loadReddit, setLoadReddit] = useState(true);
   const [loadAi, setLoadAi] = useState(false);
-  const [playing, setPlaying] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${BASE}/api/trends/tiktok?region=global&limit=20`)
+    fetch(`${BASE}/api/trends/youtube/batch`)
       .then((r) => r.json())
-      .then((d) => setTiktok(d.data ?? []))
+      .then((d) => setYoutube(d.data ?? []))
       .catch(console.error)
-      .finally(() => setLoadTiktok(false));
+      .finally(() => setLoadYoutube(false));
   }, []);
 
   useEffect(() => {
@@ -126,57 +128,42 @@ export default function TrendsPage() {
           </div>
         </div>
 
-        {/* TikTok Viral */}
+        {/* Real-time YouTube Trending */}
         <section>
           <div className="flex items-center gap-2 mb-4">
-            <Music2 className="h-5 w-5 text-accent-pink" />
-            <span className="text-lg font-bold text-text-primary">TikTok Viral Global</span>
-            <SourceBadge source="Deezer TikTok Playlist" sourceUrl="https://api.deezer.com" />
+            <Music2 className="h-5 w-5 text-rose-500" />
+            <span className="text-lg font-bold text-text-primary">Real-Time Global Trending</span>
+            <SourceBadge source="Last.fm & YouTube API" sourceUrl="https://youtube.com" />
           </div>
 
-          {loadTiktok ? (
+          {loadYoutube ? (
             <div className="h-32 bg-bg-card border border-border rounded-xl flex items-center justify-center">
-              <p className="text-text-muted animate-pulse text-sm">Đang tải dữ liệu TikTok từ Deezer...</p>
+              <p className="text-text-muted animate-pulse text-sm">Đang tải dữ liệu Real-time Trending từ YouTube & Last.fm...</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3">
-              {tiktokTracks.slice(0, 15).map((t, i) => (
+              {youtubeVideos.slice(0, 15).map((v, i) => (
                 <div
                   key={i}
-                  className="bg-bg-card border border-border rounded-xl p-3 hover:border-accent-pink/50"
+                  className="bg-bg-card border border-border rounded-xl p-3 hover:border-rose-500/50 flex flex-col"
                 >
-                  {t.image ? (
+                  {v.thumbnail ? (
                     <img
-                      src={t.image}
-                      alt={t.name}
-                      className="w-full aspect-square object-cover rounded-lg mb-2 bg-bg-elevated"
+                      src={v.thumbnail}
+                      alt={v.title}
+                      className="w-full aspect-video object-cover rounded-lg mb-2 bg-bg-elevated"
                     />
                   ) : (
-                    <div className="w-full aspect-square bg-bg-elevated rounded-lg mb-2 flex items-center justify-center">
+                    <div className="w-full aspect-video bg-bg-elevated rounded-lg mb-2 flex items-center justify-center">
                       <Music2 className="h-8 w-8 text-text-muted" />
                     </div>
                   )}
-                  <p className="text-text-primary text-xs font-semibold truncate">{t.name}</p>
-                  <p className="text-text-muted text-xs truncate">{t.artist}</p>
+                  <a href={v.source_url} target="_blank" rel="noopener noreferrer" className="text-text-primary text-xs font-semibold line-clamp-2 hover:text-rose-500 flex-1">{v.title}</a>
+                  <p className="text-text-muted text-xs truncate mt-1">{v.channel}</p>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-accent-pink font-medium">#{i + 1}</span>
-                    {t.preview && (
-                      <button
-                        onClick={() => setPlaying(playing === t.preview ? null : t.preview!)}
-                        className="text-xs text-accent-purple hover:text-accent-blue"
-                        aria-label={playing === t.preview ? "Stop" : "Play"}
-                      >
-                        {playing === t.preview ? (
-                          <Square className="h-3 w-3" />
-                        ) : (
-                          <Play className="h-3 w-3" />
-                        )}
-                      </button>
-                    )}
+                    <span className="text-xs text-rose-500 font-medium">#{i + 1}</span>
+                    <span className="text-xs text-text-muted">{Number(v.view_count).toLocaleString()} views</span>
                   </div>
-                  {playing === t.preview && (
-                    <audio src={playing} autoPlay onEnded={() => setPlaying(null)} className="hidden" />
-                  )}
                 </div>
               ))}
             </div>

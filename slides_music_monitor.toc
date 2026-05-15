@@ -1,0 +1,5 @@
+\beamer@sectionintoc {1}{TỔNG QUAN \& KIẾN TRÚC}{3}{0}{1}
+\beamer@sectionintoc {2}{THU THẬP \& TRỰC QUAN HÓA}{9}{0}{2}
+\beamer@sectionintoc {3}{PHÂN TÍCH THÔNG MINH}{14}{0}{3}
+\beamer@sectionintoc {4}{DỰ ĐOÁN \& AI AGENT}{18}{0}{4}
+\beamer@sectionintoc {5}{ĐÁNH GIÁ \& KẾT LUẬN}{22}{0}{5}

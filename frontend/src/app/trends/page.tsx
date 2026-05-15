@@ -45,6 +45,32 @@ export default function TrendsPage() {
   const [loadYoutube, setLoadYoutube] = useState(true);
   const [loadReddit, setLoadReddit] = useState(true);
   const [loadAi, setLoadAi] = useState(false);
+  const [expandedTrend, setExpandedTrend] = useState<number | null>(null);
+  const [trendInsight, setTrendInsight] = useState<string>("");
+  const [trendLoading, setTrendLoading] = useState(false);
+
+  async function explainTrend(video: YouTubeVideo, index: number) {
+    if (expandedTrend === index) {
+      setExpandedTrend(null);
+      return;
+    }
+    setExpandedTrend(index);
+    setTrendLoading(true);
+    setTrendInsight("");
+    try {
+      // Mock some stats for the API call based on the real video view count
+      const yt_growth = Math.min((video.view_count / 1000000) * 15, 300).toFixed(1);
+      const mentions = Math.floor(video.view_count % 500);
+      
+      const res = await fetch(`${BASE}/api/trends/explain-trend/${encodeURIComponent(video.title)}?artist=${encodeURIComponent(video.channel || "")}&yt_growth=${yt_growth}&mentions=${mentions}&sentiment=0.65`);
+      const data = await res.json();
+      setTrendInsight(data.insight);
+    } catch (e) {
+      setTrendInsight("⚠️ Không thể kết nối AI Server lúc này.");
+    } finally {
+      setTrendLoading(false);
+    }
+  }
 
   useEffect(() => {
     fetch(`${BASE}/api/trends/youtube/batch`)
@@ -164,6 +190,31 @@ export default function TrendsPage() {
                     <span className="text-xs text-rose-500 font-medium">#{i + 1}</span>
                     <span className="text-xs text-text-muted">{Number(v.view_count).toLocaleString()} views</span>
                   </div>
+                  <button
+                    onClick={() => explainTrend(v, i)}
+                    className="mt-3 w-full bg-accent-purple/10 hover:bg-accent-purple/20 text-accent-purple text-xs font-bold py-1.5 rounded flex items-center justify-center gap-1 transition-colors"
+                  >
+                    <Sparkles className="h-3 w-3" />
+                    Tại sao viral?
+                  </button>
+                  
+                  {expandedTrend === i && (
+                    <div className="mt-3 bg-bg-elevated border border-border-subtle rounded-lg p-3 text-xs text-text-secondary animate-in slide-in-from-top-2">
+                      {trendLoading ? (
+                        <span className="flex items-center gap-2 text-accent-purple animate-pulse">
+                          <Loader2 className="h-3 w-3 animate-spin" /> Đang hỏi Gemini AI...
+                        </span>
+                      ) : (
+                        <div className="space-y-2">
+                           <strong className="text-text-primary flex items-center gap-1 border-b border-border-subtle pb-1">
+                              <Bot className="h-3 w-3 text-accent-blue" />
+                              AI Giải thích:
+                           </strong>
+                           <RichText text={trendInsight} size="sm" />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

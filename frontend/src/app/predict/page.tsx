@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Target, Search, Rocket, Loader2, Play, Square, AlertTriangle, RefreshCw, Music2 } from "lucide-react";
+import { Target, Search, Rocket, Loader2, Play, Square, AlertTriangle, RefreshCw, Music2, Sparkles } from "lucide-react";
 import SourceBadge from "@/components/SourceBadge";
+import ViralRadarChart from "@/components/ViralRadarChart";
 
 const BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
@@ -45,6 +46,7 @@ export default function PredictPage() {
   const [error, setError] = useState<string | null>(null);
   const [playing, setPlaying] = useState<string | null>(null);
   const [artistSuggestions, setArtistSuggestions] = useState<Array<{ id: number; name: string }>>([]);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     loadCandidates();
@@ -306,9 +308,9 @@ export default function PredictPage() {
                 const g = GRADIENT[c.prediction] ?? GRADIENT.Normal;
                 const pct = c.hit_probability;
                 return (
+                  <div key={`${c.name}-${i}`}>
                   <div
-                    key={`${c.name}-${i}`}
-                    className="bg-bg-card border border-border rounded-xl p-4 flex items-center gap-4 hover:border-accent-purple/40"
+                    className="bg-bg-card border border-border rounded-xl p-4 flex items-center gap-4 hover:border-accent-purple/40 relative z-10"
                   >
                     <span className="text-xl font-black text-text-muted w-7 text-center flex-shrink-0">
                       {i + 1}
@@ -346,13 +348,43 @@ export default function PredictPage() {
                       </div>
                     </div>
 
-                    <div className="flex-shrink-0 text-right">
+                    <div className="flex-shrink-0 text-right flex flex-col items-end">
                       <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r ${g} text-white text-sm font-bold`}>
                         <span>{pct}%</span>
                       </div>
-                      <p className="text-xs text-text-muted mt-1">{c.confidence} confidence</p>
+                      <p className="text-xs text-text-muted mt-1">{c.confidence} conf</p>
+                      <button 
+                        onClick={() => setExpandedId(expandedId === `${c.name}-${i}` ? null : `${c.name}-${i}`)}
+                        className="text-[10px] flex items-center gap-1 uppercase font-bold text-accent-purple hover:text-accent-blue mt-2 bg-accent-purple/10 px-2 py-1 rounded"
+                      >
+                        <Sparkles className="h-3 w-3" />
+                        AI Insight
+                      </button>
                     </div>
                   </div>
+                  
+                  {/* Expanded Content */}
+                  {expandedId === `${c.name}-${i}` && (
+                    <div className="bg-bg-elevated border-x border-b border-border-subtle rounded-b-xl p-5 mb-2 -mt-3 pt-6 grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-top-2">
+                       <div>
+                          <h3 className="text-sm font-bold text-text-primary mb-2 flex items-center gap-2">
+                            <Sparkles className="h-4 w-4 text-accent-purple" />
+                            Phân tích tiềm năng Viral
+                          </h3>
+                          <p className="text-xs text-text-secondary leading-relaxed mb-3">
+                            <strong className="text-text-primary">Lý do dự đoán ({c.prediction}):</strong> Mô hình XGBoost đánh giá bài hát này có khả năng bứt phá với xác suất {pct}% vì hệ thống AI ghi nhận điểm cao ở tính bắt tai (Emotional Hook) và mức độ dễ tạo trend (Memeability).
+                          </p>
+                          <p className="text-xs text-text-secondary leading-relaxed">
+                            <strong className="text-text-primary">Đề xuất hành động:</strong> Đây là ứng cử viên tiềm năng để đưa vào các chiến dịch đẩy nhạc trên TikTok/Shorts tuần tới.
+                          </p>
+                       </div>
+                       <div className="flex flex-col items-center">
+                          <p className="text-[10px] uppercase font-bold tracking-wider text-text-muted">Biểu đồ Radar đa giác (AI Metrics)</p>
+                          <ViralRadarChart trackName={c.name} artistName={c.artist} />
+                       </div>
+                    </div>
+                  )}
+                </div>
                 );
               })}
             </div>

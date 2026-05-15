@@ -10,6 +10,7 @@ import {
   Newspaper,
   MessageSquare,
   Music2,
+  Sparkles,
 } from "lucide-react";
 import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/nextjs";
 import ThemeToggle from "./ThemeToggle";
@@ -17,6 +18,7 @@ import ThemeToggle from "./ThemeToggle";
 const NAV_ITEMS = [
   { href: "/briefing", label: "Briefing", icon: Newspaper },
   { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
+  { href: "/insight", label: "Market Insight", icon: Sparkles },
   { href: "/map", label: "World Map", icon: Globe2 },
   { href: "/trends", label: "Trending", icon: Flame },
   { href: "/predict", label: "Prediction", icon: Target },

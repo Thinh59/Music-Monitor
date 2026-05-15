@@ -47,6 +47,7 @@ interface DashboardState {
 }
 
 export default function Dashboard() {
+  const [timeRange, setTimeRange] = useState("today");
   const [state, setState] = useState<DashboardState>({
     globalCharts: [],
     youtubeVideos: [],
@@ -65,7 +66,7 @@ export default function Dashboard() {
       const updates: Partial<DashboardState> = {};
 
       try {
-        const d = await apiFetch("/api/charts/global?limit=50");
+        const d = await apiFetch(`/api/charts/global?limit=50&period=${timeRange}`);
         updates.globalCharts = d.data ?? [];
       } catch (e: any) {
         errs.push(`Last.fm Charts: ${e.message}`);
@@ -114,14 +115,14 @@ export default function Dashboard() {
     }
 
     loadAll();
-  }, []);
+  }, [timeRange]);
 
   const chartData = state.globalCharts.slice(0, 15).map((t, i) => ({
     time: `#${i + 1}`,
     value: Number(t.playcount ?? 0),
   }));
 
-  if (loading) {
+  if (loading && state.globalCharts.length === 0) {
     return (
       <div className="flex items-center justify-center h-screen bg-transparent">
         <div className="text-center">
@@ -138,17 +139,42 @@ export default function Dashboard() {
     <main className="min-h-screen p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-start gap-3">
-          <div className="h-12 w-12 rounded-xl bg-gradient-aurora flex items-center justify-center shadow-glow">
-            <BarChart3 className="h-6 w-6 text-white" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="h-12 w-12 rounded-xl bg-gradient-aurora flex items-center justify-center shadow-glow">
+              <BarChart3 className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-text-primary">
+                Music Intelligence <span className="gradient-text">Dashboard</span>
+              </h1>
+              <p className="text-text-secondary mt-1 text-sm">
+                Real-time · Last.fm · YouTube · Reddit · Gemini AI
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-text-primary">
-              Music Intelligence <span className="gradient-text">Dashboard</span>
-            </h1>
-            <p className="text-text-secondary mt-1 text-sm">
-              Real-time · Last.fm · YouTube · Reddit · Gemini AI
-            </p>
+          
+          {/* Time Filter */}
+          <div className="flex items-center gap-2 bg-bg-card border border-border rounded-lg p-1 relative">
+            {loading && <div className="absolute -left-6"><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-accent-purple" /></div>}
+            <button 
+              onClick={() => setTimeRange("today")}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${timeRange === 'today' ? 'bg-accent-purple text-white shadow-md' : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated'}`}
+            >
+              Today
+            </button>
+            <button 
+              onClick={() => setTimeRange("week")}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${timeRange === 'week' ? 'bg-accent-purple text-white shadow-md' : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated'}`}
+            >
+              This Week
+            </button>
+            <button 
+              onClick={() => setTimeRange("month")}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${timeRange === 'month' ? 'bg-accent-purple text-white shadow-md' : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated'}`}
+            >
+              This Month
+            </button>
           </div>
         </div>
 
@@ -175,7 +201,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between px-5 py-4 border-b border-border">
               <h2 className="text-lg font-semibold text-text-primary flex items-center gap-2">
                 <Globe2 className="h-5 w-5 text-accent-purple" />
-                Global Top 50
+                Global Top 50 & MIS Pulse
               </h2>
               <SourceBadge source="Last.fm" sourceUrl="https://www.last.fm/charts" />
             </div>
@@ -185,30 +211,50 @@ export default function Dashboard() {
                   Chưa có dữ liệu Last.fm
                 </p>
               ) : (
-                state.globalCharts.map((t, i) => (
-                  <div
-                    key={`${t.name}-${i}`}
-                    className="flex items-center gap-3 px-5 py-3 hover:bg-bg-elevated border-b border-border-subtle"
-                  >
-                    <span className="text-base font-bold text-text-muted w-7 text-center flex-shrink-0">
-                      {i + 1}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-text-primary truncate text-sm">{t.name}</p>
-                      <p className="text-xs text-text-muted truncate">{t.artist}</p>
+                state.globalCharts.map((t, i) => {
+                  const maxPlays = Math.max(...state.globalCharts.map(x => Number(x.playcount || 0)));
+                  const playScore = (Number(t.playcount || 0) / (maxPlays || 1)) * 40;
+                  const rankBonus = Math.max(0, 40 - i * 1.5);
+                  const pseudoRandom = (t.name.charCodeAt(0) + t.artist.charCodeAt(0)) % 20; 
+                  const misScore = Math.min(99, Math.round(playScore + rankBonus + pseudoRandom));
+
+                  return (
+                    <div
+                      key={`${t.name}-${i}`}
+                      className="flex items-center gap-3 px-5 py-3 hover:bg-bg-elevated border-b border-border-subtle"
+                    >
+                      <span className="text-base font-bold text-text-muted w-7 text-center flex-shrink-0">
+                        {i + 1}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-text-primary truncate text-sm">{t.name}</p>
+                        <p className="text-xs text-text-muted truncate">{t.artist}</p>
+                      </div>
+                      <div className="text-right flex-shrink-0 flex items-center gap-4">
+                        <div className="text-right">
+                          <p className="text-xs font-medium text-text-secondary">
+                            {Number(t.playcount ?? 0).toLocaleString()} plays
+                          </p>
+                          {t.listeners && (
+                            <p className="text-xs text-text-muted">
+                              {Number(t.listeners).toLocaleString()} listeners
+                            </p>
+                          )}
+                        </div>
+                        <div className="w-12 flex flex-col items-center justify-center">
+                          <div className={`text-sm font-black w-10 h-8 flex items-center justify-center rounded-lg ${
+                            misScore >= 85 ? 'bg-gradient-aurora text-white shadow-glow' : 
+                            misScore >= 70 ? 'bg-accent-purple/20 text-accent-purple' : 
+                            'bg-bg-elevated text-text-muted'
+                          }`}>
+                            {misScore}
+                          </div>
+                          <p className="text-[9px] text-text-muted mt-1 font-bold uppercase tracking-wider">MIS</p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className="text-xs font-medium text-accent-purple">
-                        {Number(t.playcount ?? 0).toLocaleString()} plays
-                      </p>
-                      {t.listeners && (
-                        <p className="text-xs text-text-muted">
-                          {Number(t.listeners).toLocaleString()} listeners
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>

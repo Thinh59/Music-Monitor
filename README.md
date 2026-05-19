@@ -349,5 +349,8 @@ npx vercel --prod
 | VADER Sentiment | https://github.com/cjhutto/vaderSentiment | Sentiment analysis |
 
 ---
+## VIDEO DEMO
+https://youtu.be/KjsEracAcn4
+---
 
 *Đồ án: Global Music Intelligence Monitor — Phân tích Dữ liệu Thông minh — Tháng 4, 2026*

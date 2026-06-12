@@ -52,6 +52,8 @@
     bottom=3cm,
     footskip=1.5cm
 ]{geometry}
+\setlength{\headheight}{14.5pt}
+\setlength{\headsep}{18pt}
 
 % - Màu sắc -
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -222,7 +224,7 @@ Dự án \textbf{World Music Intelligence Monitor} được thực hiện trong 
     & 100\% \\
 \hline
 23122015 & Nguyễn Gia Bảo &
-    \textbf{Backend:} Xây dựng toàn bộ hệ thống FastAPI (routers, services, scheduler APScheduler); tích hợp Firebase Firestore làm database; thiết kế cache 3 lớp; cấu hình sẵn sàng triển khai trên Render.com; hỗ trợ phân tích dữ liệu
+    \textbf{Backend:} Xây dựng toàn bộ hệ thống FastAPI (routers, services, scheduler APScheduler); tích hợp Firebase Firestore làm database; thiết kế cache 3 lớp; triển khai trên Render.com; hỗ trợ phân tích dữ liệu
     & 100\% \\
 \hline
 23120080 & Nguyễn Ngọc Như Quỳnh &
@@ -279,8 +281,8 @@ Một số nền tảng phân tích âm nhạc hiện có trên thị trường:
 Hệ thống được xây dựng theo kiến trúc \textbf{3-tier} rõ ràng:
 
 \begin{itemize}
-    \item \textbf{Tầng Frontend (Next.js 14):} Giao diện người dùng sử dụng App Router, TypeScript, TailwindCSS. Trực quan hoá dữ liệu bằng Recharts (bar, line, radar, donut chart). Hiệu ứng animation với Framer Motion. Quản lý state với SWR (stale-while-revalidate). Hỗ trợ dark/light mode qua next-themes. Hoạt động tại cổng 3000 và đã tối ưu hóa để triển khai trên Vercel.
-    \item \textbf{Tầng Backend (FastAPI + Python 3.11):} Xử lý logic nghiệp vụ, điều phối AI/ML, lên lịch thu thập dữ liệu. Hoạt động qua cổng 8000 và đã cấu hình sẵn sàng triển khai trên Render.com.
+    \item \textbf{Tầng Frontend (Next.js 14):} Giao diện người dùng sử dụng App Router, TypeScript, TailwindCSS. Trực quan hoá dữ liệu bằng Recharts (bar, line, radar, donut chart). Hiệu ứng animation với Framer Motion. Quản lý state với SWR (stale-while-revalidate). Hỗ trợ dark/light mode qua next-themes. Triển khai trên Vercel, cổng 3000.
+    \item \textbf{Tầng Backend (FastAPI + Python 3.11):} Xử lý logic nghiệp vụ, điều phối AI/ML, lên lịch thu thập dữ liệu. Triển khai trên Render.com, cổng 8000.
     \item \textbf{Tầng Data (Firebase Firestore + File Cache):} Lưu trữ và cache dữ liệu đã thu thập.
 \end{itemize}
 
@@ -976,7 +978,7 @@ Bên cạnh các chỉ số tương tác thông thường, hệ thống đặc b
 
 \subsection{Kiến trúc và huấn luyện XGBoost}
 
-Mô hình XGBoost được huấn luyện trên \textbf{Kaggle} (notebook \texttt{music-monitor-\allowbreak{}eda-\allowbreak{}training.ipynb}):
+Mô hình XGBoost được huấn luyện trên \textbf{Kaggle} (notebook \texttt{music-monitor-\allowbreak{}eda-\allowbreak{}training.ipynb}):\\
 
 Sơ đồ thiết lập cấu hình siêu tham số (Hyperparameters) cho mô hình XGBoost được thể hiện ở Hình~\ref{fig:xgboost_config}.
 
@@ -1011,7 +1013,7 @@ Sơ đồ thiết lập cấu hình siêu tham số (Hyperparameters) cho mô h�
 
     \end{tikzpicture}
     }
-    \caption{Cấu hình siêu tham số (Hyperparameters) cho mô hình XGBoost Hit Prediction}
+    \caption{Cấu hình siêu tham số cho mô hình XGBoost Hit Prediction}
     \label{fig:xgboost_config}
 \end{figure}
 
@@ -1028,7 +1030,7 @@ Sơ đồ thiết lập cấu hình siêu tham số (Hyperparameters) cho mô h�
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/feature-importance.png}
-    \caption{Feature Importance XGBoost: youtube\_growth\_24h và lastfm\_listeners là đặc trưng quan trọng nhất}
+    \caption{Feature Importance XGBoost: reddit\_mention\_24h và lastfm\_listeners là đặc trưng quan trọng nhất}
     \label{fig:feature_importance}
 \end{figure}
 
@@ -1081,7 +1083,7 @@ Khi người dùng nhập tên bài + nghệ sĩ, backend tự động:
 
 \section{Giải thích Dự đoán (Explainable AI)}
 
-Một trong những thách thức lớn nhất của ML trong thực tế là ``hộp đen'': mô hình cho ra xác suất nhưng không giải thích \textit{tại sao}. Hệ thống giải quyết vấn đề này bằng pipeline \textbf{Explainable AI} 4 tầng, biến output số của XGBoost thành lời khuyên hành động cụ thể bằng ngôn ngữ tự nhiên.
+Một trong những thách thức lớn nhất của ML trong thực tế là ``hộp đen'': mô hình cho ra xác suất nhưng không giải thích \textit{tại sao}. Hệ thống giải quyết vấn đề này bằng pipeline \textbf{Explainable AI} 4 tầng, biến output số của XGBoost thành lời khuyên hành động cụ thể bằng ngôn ngữ tự nhiên.\\
 
 Sơ đồ pipeline Explainable AI được trình bày ở Hình~\ref{fig:xai_pipeline}.
 
@@ -1420,26 +1422,52 @@ Sơ đồ cơ chế quản lý và xác thực biến môi trường (Environmen
 
 \textbf{YouTube Quota:} 10.000 units/ngày. Batch fetch chỉ lấy top 8-10 tracks, tránh gọi quá nhiều.
 
-\section{Kiến trúc và Kế hoạch triển khai}
+% \section{Triển khai}
 
-Hệ thống được thiết kế linh hoạt, đảm bảo hoạt động ổn định ở môi trường cục bộ (Local Development) trong quá trình phát triển đồ án, đồng thời đã thiết lập sẵn các cấu hình để có thể đưa lên nền tảng đám mây (Production) trong tương lai:
+% \begin{itemize}
+%     \item \textbf{Frontend:} Next.js 14, port 3000
+%     \item \textbf{Backend:} FastAPI + Uvicorn, port 8000
+%     \item \textbf{Database:} Firebase Firestore (Google Cloud)
+% \end{itemize}
 
-\begin{itemize}
-    \item \textbf{Môi trường phát triển (Local):}
-    \begin{itemize}
-        \item \textbf{Frontend:} Chạy qua Node.js ở cổng \texttt{3000}.
-        \item \textbf{Backend:} Khởi chạy bằng Uvicorn ở cổng \texttt{8000}.
-    \end{itemize}
-    \item \textbf{Môi trường Production (Kế hoạch triển khai):}
-    \begin{itemize}
-        \item \textbf{Frontend:} Mã nguồn Next.js được cấu hình sẵn để tương thích hoàn toàn với nền tảng Vercel.
-        \item \textbf{Backend:} Thiết lập sẵn \texttt{requirements.txt} và \texttt{Dockerfile} để tự động build và chạy trên nền tảng Render.com.
-        \item \textbf{CI/CD:} Đã chuẩn bị kịch bản Auto-deploy từ GitHub khi push lên nhánh \texttt{main}.
-    \end{itemize}
-    \item \textbf{Database:} Sử dụng chung cơ sở dữ liệu đám mây thực tế là Firebase Firestore (Google Cloud) cho cả quá trình phát triển và kiểm thử.
+% CORS được cấu hình chặt chẽ: chỉ cho phép origin từ localhost (development) và domain Vercel (production).
+\section{Phương án triển khai và hạ tầng}
+
+Hiện tại, trong giai đoạn phát triển và thử nghiệm, toàn bộ hệ thống đang được vận hành ổn định trên môi trường cục bộ (Local Development Environment) sử dụng Docker Compose để đồng bộ các thành phần (Frontend Next.js chạy ở cổng 3000, Backend FastAPI chạy ở cổng 8000). 
+
+Để chuẩn bị cho quá trình đưa sản phẩm lên môi trường internet thực tế (Production), hệ thống đã được thiết lập cấu hình và thiết kế sẵn sàng để triển khai lên các nền tảng đám mây (Cloud Platforms) phổ biến. Phương án triển khai được chia làm ba thành phần độc lập tương ứng với kiến trúc 3-tier:
+
+\subsection{Hạ tầng triển khai (Cloud Infrastructure)}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Frontend (Vercel):} Ứng dụng Next.js 14 được cấu hình để triển khai trực tiếp trên nền tảng Vercel. Vercel cung cấp cơ chế Edge Network toàn cầu, tự động tối ưu hóa các trang Static và Dynamic, đồng thời hỗ trợ Server-Side Rendering (SSR) một cách hiệu quả nhờ tích hợp sâu với Next.js.
+    \item \textbf{Backend (Render.com):} Dịch vụ FastAPI được cấu hình chạy trong môi trường containerized hoặc Python native trên Render. Render.com cung cấp cơ chế Web Service tự động quản lý port, tài nguyên (CPU/RAM free tier) và tự động khởi động lại dịch vụ nếu xảy ra sự cố gián đoạn.
+    \item \textbf{Database (Firebase Firestore):} Cơ sở dữ liệu NoSQL Firestore được lưu trữ trực tiếp trên đám mây của Google Cloud Platform (GCP). Nhờ mô hình Serverless, Firestore tự động scale theo số lượng bản ghi và truy cập mà không cần quản trị máy chủ, đồng thời cung cấp SDK bảo mật để truy xuất dữ liệu nhanh chóng.
 \end{itemize}
 
-Cấu hình CORS (Cross-Origin Resource Sharing) tại Backend cũng được thiết lập chặt chẽ: hiện tại cấp quyền truy cập đầy đủ cho \texttt{http://localhost:3000} (để chạy demo) và đã định nghĩa sẵn mảng \texttt{origins} chờ cập nhật tên miền chính thức của Vercel khi đưa lên Production.
+\subsection{Luồng tích hợp và triển khai liên tục(CI/CD Pipeline)}
+
+Hệ thống tích hợp quy trình triển khai tự động (Continuous Integration \& Continuous Deployment) kết nối trực tiếp với kho lưu trữ mã nguồn GitHub:
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Kích hoạt tự động (Triggers):} Mỗi khi mã nguồn mới được đẩy (push) lên nhánh chính (\texttt{main}) trên GitHub, hệ thống Webhook sẽ gửi tín hiệu cập nhật đến Vercel và Render.
+    \item \textbf{Xây dựng và kiểm thử (Build \& Test):}
+    \begin{itemize}
+        \item \textbf{Vercel:} Tự động chạy lệnh \texttt{npm run build} để tối ưu hóa mã nguồn React/Next.js, nén CSS/JS và biên dịch sang dạng production-ready.
+        \item \textbf{Render:} Tải về mã nguồn Backend, khởi tạo môi trường Python 3.11, cài đặt các thư viện phụ thuộc qua \texttt{pip install -r requirements.txt} và thực hiện kiểm thử tự động (Unit Test) trước khi khởi chạy dịch vụ.
+    \end{itemize}
+    \item \textbf{Deploy:} Khi quá trình build thành công, cả hai nền tảng sẽ thực hiện tráo đổi phiên bản cũ (Zero-downtime deployment) để đảm bảo người dùng không bị gián đoạn truy cập.
+\end{enumerate}
+
+\subsection{Cấu hình môi trường và Bảo mật triển khai}
+
+Vì hệ thống chưa thực hiện triển khai thực tế trên môi trường production chính thức, cấu hình bảo mật và các biến môi trường được thiết kế chặt chẽ nhằm chuẩn bị cho việc publish:
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Quản lý khóa bí mật (Secrets Management):} Các API key nhạy cảm (như Google API, Last.fm API, Clerk Secrets) tuyệt đối không được lưu trong mã nguồn. Thay vào đó, chúng được cấu hình trực tiếp trong phần \textit{Environment Variables} của Dashboard Render và Vercel. Khi khởi chạy, hệ thống sẽ đọc các biến này vào class \texttt{Settings} của Pydantic để đảm bảo tính an toàn.
+    \item \textbf{Cấu hình CORS (Cross-Origin Resource Sharing):} Để ngăn chặn tấn công giả mạo và truy cập API trái phép, cấu hình CORS của FastAPI tại production được giới hạn nghiêm ngặt: chỉ cho phép các request có origin xuất phát từ domain chính thức được cấp bởi Vercel.
+    \item \textbf{Xác thực Firebase:} File cấu hình Firebase service account JSON được mã hóa hoặc truyền dưới dạng chuỗi biến môi trường và giải mã động tại runtime, tránh rò rỉ quyền ghi đọc cơ sở dữ liệu.
+\end{itemize}
+
 % ============================================================
 % CHƯƠNG 7 — KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
 % ============================================================
@@ -1471,18 +1499,22 @@ Khi thuật toán K-Means phân cụm 89 quốc gia dựa trên vector đặc tr
     \item \textbf{Giá trị thực tiễn:} Các nhãn hàng âm nhạc (Music Labels) và nền tảng streaming có thể dùng mô hình phân cụm này để \textbf{thiết kế chiến lược phân phối nội dung xuyên biên giới (cross-border content distribution)} chính xác hơn, thay vì marketing theo địa lý truyền thống. Ví dụ: khi phát hành một album K-Pop, thay vì chỉ target Châu Á, dữ liệu gợi ý nên đồng thời ưu tiên thị trường Mỹ Latin và Đông Nam Á vì chúng thuộc cùng một ``vùng văn hoá'' theo dữ liệu thực tế.
 \end{itemize}
 
-Insight này là bằng chứng rõ ràng nhất cho luận điểm trung tâm của hệ thống: \textit{Âm nhạc hiện đại không còn là sản phẩm của một vùng đất, mà là sản phẩm của những thuật toán gợi ý toàn cầu.}
+Insight này là bằng chứng rõ ràng nhất cho luận điểm trung tâm của hệ thống: \textit{Âm nhạc hiện đại không còn là sản phẩm của một vùng, mà là sản phẩm của những thuật toán gợi ý toàn cầu.}
 
 \section{Hướng Phát Triển}
 
 \textbf{1. Nâng quota API và tách worker:} Ưu tiên \#1 cho production thật. Tách scheduler thành worker riêng, dùng message queue (Redis/Celery). Nâng YouTube API key lên Billing để tăng quota.
 
+\noindent
 \textbf{2. Event-driven streaming thật:} Hiện tại polling định kỳ. Chuyển sang event-driven với WebSocket/Kafka cho true real-time.
 
+\noindent
 \textbf{3. Phân quyền RBAC:} Triển khai Admin/Viewer roles với Clerk. Admin có thể trigger manual refresh, xem metrics; Viewer chỉ đọc.
 
+\noindent
 \textbf{4. Mô hình hit prediction với dữ liệu thực:} Sau 3-6 tháng thu thập, có thể retrain XGBoost với dữ liệu lịch sử thực từ Firestore thay vì dữ liệu synthetic.
 
+\noindent
 \textbf{5. Tích hợp thêm TikTok API chính thức:} Khi có API key, thay thế Deezer TikTok proxy bằng dữ liệu TikTok trực tiếp để chính xác hơn.
 
 % ============================================================
@@ -1556,7 +1588,7 @@ Deezer API Documentation.
 \begin{itemize}
     \item Source code: \href{https://github.com/Thinh59/Music-Monitor}{https://github.com/Thinh59/Music-Monitor}
     \item Video demo: \href{https://youtu.be/KjsEracAcn4?si=pUIJTtgdBZ43e7jL}{https://youtu.be/KjsEracAcn4}
-    \item Kaggle notebook (EDA \& Training): \href{https://www.kaggle.com/}{music-monitor-eda-training.ipynb}
+
 \end{itemize}
 
 \section{Bảng API Endpoints}
@@ -1627,6 +1659,8 @@ Deezer API Documentation.
 
 \begin{verbatim}
 Music-Monitor/
+├── docs/
+│   └── YeuCauDoAn.md            # Tài liệu yêu cầu đồ án
 ├── backend/
 │   ├── app/
 │   │   ├── main.py              # FastAPI entrypoint
@@ -1638,8 +1672,6 @@ Music-Monitor/
 │   │   ├── ai/                  # AI/ML modules + tools/
 │   │   └── models/              # hit_predictor.joblib
 │   └── requirements.txt
-├── docs/
-│   └── YeuCauDoAn.md            # Tài liệu yêu cầu đồ án
 ├── frontend/
 │   ├── src/
 │   │   ├── app/                 # Next.js 14 App Router pages

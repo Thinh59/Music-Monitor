@@ -1197,32 +1197,33 @@ Sơ đồ vòng lặp ReAct được mô tả chi tiết ở Hình~\ref{fig:reac
     \centering
     \resizebox{0.8\textwidth}{!}{
     \begin{tikzpicture}[
-        node distance = 1.2cm and 1.5cm,
+        node distance = 1.5cm and 2.2cm,
         box/.style = {draw, rectangle, rounded corners=5pt, minimum width=3.0cm, minimum height=1.2cm, align=center, font=\small\bfseries, line width=1pt},
         agent/.style = {box, fill=mprimary!10, draw=mprimary},
         thought/.style = {box, fill=maccent!10, draw=maccent},
         action/.style = {box, fill=borderblue!10, draw=borderblue},
         obs/.style = {box, fill=mgood!10, draw=mgood},
         final/.style = {box, fill=black!8, draw=black!60, dashed},
-        arrow/.style = {draw=black!70, -{Stealth[scale=1.1]}, line width=1.1pt}
+        arrow/.style = {draw=black!70, -{Stealth[scale=1.1]}, line width=1.1pt},
+        lbl/.style = {font=\footnotesize, fill=white, inner sep=2pt}
     ]
 
-        \node (user) [agent, rounded corners=15pt] {Người dùng\\(Prompt)};
-        \node (thought) [thought, below=of user] {1. Thought\\(Suy luận ngữ cảnh)};
+        \node (thought) [thought] {1. Thought\\(Suy luận ngữ cảnh)};
         \node (action) [action, right=of thought] {2. Action\\(Gọi API / Tool)};
-        \node (obs) [obs, right=of user] {3. Observation\\(Nhận kết quả)};
+        \node (obs) [obs, above=of action] {3. Observation\\(Nhận kết quả)};
+        \node (user) [agent, rounded corners=15pt, above=of thought] {Người dùng\\(Prompt)};
         
         \node (final) [final, left=of thought] {Final Answer\\(Trả lời user)};
 
         \draw [arrow] (user) -- (thought);
         \draw [arrow] (thought) -- (action);
-        \draw [arrow] (action) -- node[right] {Thực thi} (obs);
-        \draw [arrow] (obs) -- node[above] {Phân tích} (user);
+        \draw [arrow] (action) -- node[right, lbl] {Thực thi} (obs);
+        \draw [arrow] (obs) -- node[above, lbl] {Phân tích} (user);
         
-        \draw [arrow] (thought) -- node[above] {Đủ thông tin} (final);
+        \draw [arrow] (thought) -- node[above, lbl] {Đủ thông tin} (final);
         
         % Vòng lặp
-        \draw[arrow, maccent, dashed] (obs.north) |- ++(0, 0.8) -| node[pos=0.25, above, text=maccent] {Vòng lặp (Max 6 Iterations)} (user.north);
+        \draw[arrow, maccent, dashed] (obs.north) |- ++(0, 0.8) -| node[pos=0.25, above, text=maccent, lbl] {Vòng lặp (Max 6 Iterations)} (user.north);
 
     \end{tikzpicture}
     }

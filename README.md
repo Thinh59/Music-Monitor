@@ -3,6 +3,7 @@
 > **Mục tiêu:** Xây dựng nền tảng web phân tích & dự đoán xu hướng âm nhạc toàn cầu theo real-time, tích hợp AI, có nguồn trích dẫn rõ ràng.
 
 [![Video Demo](https://img.youtube.com/vi/KjsEracAcn4/0.jpg)](https://youtu.be/KjsEracAcn4)
+
 **Video Demo:** [https://youtu.be/KjsEracAcn4](https://youtu.be/KjsEracAcn4)
 
 ---
@@ -102,4 +103,4 @@ npm run dev
 
 ## 👨‍💻 THÔNG TIN
 
-*Đồ án môn học: Global Music Intelligence Monitor — Phân tích Dữ liệu Thông minh — Tháng 6, 2026*
+*Đồ án môn học: Global Music Intelligence Monitor - Phân tích Dữ liệu Thông minh - Tháng 6, 2026*

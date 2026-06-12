@@ -138,52 +138,34 @@
 \begin{frame}[plain]
 \vspace{0.4cm}
 \begin{columns}[c]
-\column{0.52\textwidth}
+\column{0.50\textwidth}
   \begin{center}
     {\Huge\bfseries\color{mprimary} World Music\\[4pt] Intelligence Monitor}\\[10pt]
     {\large\itshape\color{mprimary!80} Phân tích \& cập nhật bản tin âm nhạc toàn cầu — realtime}\\[14pt]
     {\large\bfseries SonicT2All}\\[4pt]
     {\small\color{mgray} Phân tích Dữ liệu Thông minh}\\[8pt]
     {\scriptsize\color{mgray} 
-      GVHD: TS. Nguyễn Tiến Huy, ThS. Nguyễn Thanh Tình\\[3pt]
-      Thành viên: Bàng Mỹ Linh, Lại Nguyễn Hồng Thanh,\\
-      Phan Huỳnh Châu Thịnh, Nguyễn Gia Bảo, Nguyễn Ngọc Như Quỳnh
-    }\\[12pt]
+      GVHD: TS. Nguyễn Tiến Huy, ThS. Nguyễn Thanh Tình\\[6pt]
+      \begin{tabular}{@{}l@{\hspace{6pt}}l@{}}
+        Bàng Mỹ Linh          & \texttt{23122009} \\[2pt]
+        Lại Nguyễn Hồng Thanh & \texttt{23122018} \\[2pt]
+        Phan Huỳnh Châu Thịnh & \texttt{23122019} \\[2pt]
+        Nguyễn Gia Bảo        & \texttt{23122015} \\[2pt]
+        Nguyễn Ngọc Như Quỳnh & \texttt{23120080} \\
+      \end{tabular}
+    }\\[10pt]
     \eqbars{maccent}
   \end{center}
 
-\column{0.48\textwidth}
+\column{0.50\textwidth}
   \begin{center}
-    \begin{tikzpicture}[every node/.style={font=\scriptsize}]
-      \node[aibox, circle, minimum size=1.8cm, align=center, inner sep=0pt] (center) at (0,0) {\faChartLine\\[2pt]Monitor};
-      
-      \node[srcbox] (s1) at (90:2.1cm) {Last.fm};
-      \node[srcbox] (s2) at (18:2.1cm) {\faYoutube~YouTube};
-      \node[srcbox] (s3) at (162:2.1cm) {\faSpotify~Spotify};
-      \node[srcbox] (s4) at (306:2.1cm) {\faReddit~Reddit};
-      \node[srcbox] (s5) at (234:2.1cm) {Deezer};
-      
-      \draw[arr] (s1) -- (center);
-      \draw[arr] (s2) -- (center);
-      \draw[arr] (s3) -- (center);
-      \draw[arr] (s4) -- (center);
-      \draw[arr] (s5) -- (center);
-      
-      \node[pbox, font=\scriptsize, inner sep=3pt] (o1) at (205:2.6cm) {Dashboard};
-      \node[pbox, font=\scriptsize, inner sep=3pt] (o2) at (270:2.6cm) {World Map};
-      \node[pbox, font=\scriptsize, inner sep=3pt] (o3) at (335:2.6cm) {AI Chat};
-      
-      \draw[darr] (center) -- (o1);
-      \draw[darr] (center) -- (o2);
-      \draw[darr] (center) -- (o3);
-      
-    \end{tikzpicture}
+    \includegraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{slides/figures/music_monitor_cover.png}
   \end{center}
 \end{columns}
 \end{frame}
 
 % ─── Slide 1: Outline ────────────────────────────────────────────────────────
-\begin{frame}{Lộ Trình Trình Bày}
+\begin{frame}{Outline}
 \vspace{0.8cm}
 \begin{center}
 \begin{tikzpicture}[x=2.5cm, y=1cm]
@@ -231,6 +213,59 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
 % ─── SECTION DIVIDER ──────────────────────────────────────────────────────────
 \section{TỔNG QUAN \& KIẾN TRÚC}
 
+% ─── Slide 2: Bối Cảnh & Đặt Vấn Đề ───────────────────────────────────────────
+\begin{frame}{Bối Cảnh \& Đặt Vấn Đề}
+
+\begin{columns}[c]
+\column{0.48\textwidth}
+\begin{badbox}
+  \textbf{THỰC TRẠNG}\\[4pt]
+  \scriptsize
+  \faTimes~ \textbf{Phân mảnh:} Dữ liệu rải rác trên YouTube, Last.fm, TikTok, Reddit.\\[4pt]
+  \faTimes~ \textbf{Có độ trễ:} Bảng xếp hạng truyền thống phản ứng chậm với trend.\\[4pt]
+  \faTimes~ \textbf{Thiếu chiều sâu:} Biết bài hát hot, nhưng không hiểu \textit{tại sao} hot.
+\end{badbox}
+
+\vspace{0.3cm}
+\begin{goodbox}
+  \textbf{GIẢI PHÁP}\\[4pt]
+  \scriptsize
+  \faCheck~ \textbf{Realtime Pipeline:} Giám sát đa nguồn liên tục.\\[4pt]
+  \faCheck~ \textbf{AI/ML Models:} Nhận diện viral \& dự đoán bản hit.\\[4pt]
+  \faCheck~ \textbf{LLM Agent:} Đọc hiểu cộng đồng, tóm tắt lý do viral.
+\end{goodbox}
+
+\column{0.50\textwidth}
+\begin{center}
+  \begin{tikzpicture}[every node/.style={font=\scriptsize}, scale=0.85, transform shape]
+    \node[aibox, circle, minimum size=1.8cm, align=center, inner sep=0pt] (center) at (0,0) {\faChartLine\\[2pt]Monitor};
+    
+    \node[srcbox] (s1) at (-2.4, 1.0) {\faYoutube~YouTube};
+    \node[srcbox] (s2) at (-1.0, 1.8) {Last.fm};
+    \node[srcbox] (s3) at (1.0, 1.8) {\faReddit~Reddit};
+    \node[srcbox] (s4) at (2.4, 1.0) {Deezer};
+    
+    \draw[arr] (s1) -- (center);
+    \draw[arr] (s2) -- (center);
+    \draw[arr] (s3) -- (center);
+    \draw[arr] (s4) -- (center);
+    
+    \node[pbox, font=\scriptsize, inner sep=4pt] (o1) at (-2.2, -1.4) {Dashboard};
+    \node[pbox, font=\scriptsize, inner sep=4pt] (o2) at (0, -2.2) {World Map};
+    \node[pbox, font=\scriptsize, inner sep=4pt] (o3) at (2.2, -1.4) {AI Chat};
+    
+    \draw[darr] (center) -- (o1);
+    \draw[darr] (center) -- (o2);
+    \draw[darr] (center) -- (o3);
+  \end{tikzpicture}
+\end{center}
+\end{columns}
+
+\vspace{0.4cm}
+\takeaway{World Music Monitor: Lời giải cho bài toán phân tích âm nhạc kỷ nguyên số.}
+
+\end{frame}
+
 % ─── Slide 2: Bài Toán & Giải Pháp ───────────────────────────────────────────
 \begin{frame}{Tổng Quan Nền Tảng}
 
@@ -240,22 +275,16 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
 \begin{itemize}\footnotesize\setlength\itemsep{10pt}
   \item \textbf{Global Music Intelligence:} Phân tích dữ liệu âm nhạc theo thời gian thực.
   \item \textbf{Hệ sinh thái đa tính năng:} Từ Giám sát tổng quan (Dashboard), Phân cụm thị hiếu (World Map), đến Dự đoán (Prediction).
-  \item \textbf{Đa nguồn dữ liệu:} Tích hợp luồng dữ liệu từ YouTube, Spotify, Last.fm và mạng xã hội Reddit.
+  \item \textbf{Đa nguồn dữ liệu:} Tích hợp luồng dữ liệu từ YouTube, Deezer, Last.fm và mạng xã hội Reddit.
   \item \textbf{Tích hợp AI Đích thực:} Tiên phong ứng dụng mô hình ngôn ngữ lớn (Gemini) vào hệ thống phân tích.
 \end{itemize}
 
 \column{0.46\textwidth}
 \begin{center}
-  \begin{tikzpicture}
-    \node[draw=mprimary!50, fill=white, rounded corners=4pt, dashed, line width=1pt, minimum width=\linewidth, minimum height=0.3\textheight, align=center, font=\footnotesize\color{mprimary!80}] {%
-      \faImage~\textbf{[ẢNH CẦN CHÈN]}\\[4pt]Bright Mode\\\% [IMG] overview-bright.png};
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth,height=0.3\textheight,keepaspectratio]{slides/figures/bright-mode.png}
   
   \vspace{0.15cm}
-  \begin{tikzpicture}
-    \node[draw=mprimary!50, fill=mdark, rounded corners=4pt, dashed, line width=1pt, minimum width=\linewidth, minimum height=0.3\textheight, align=center, font=\footnotesize\color{mlight}] {%
-      \faImage~\textbf{[ẢNH CẦN CHÈN]}\\[4pt]Dark Mode\\\% [IMG] overview-dark.png};
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth,height=0.3\textheight,keepaspectratio]{slides/figures/dark-mode.png}
 \end{center}
 \end{columns}
 
@@ -293,11 +322,10 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
   \node[draw=mgray!50, dashed, rounded corners=3pt, minimum width=7.2cm, minimum height=1.8cm] (ext_left) at (-2.4, -1.55) {};
   \node[font=\scriptsize\color{mgray}, anchor=south west, xshift=4pt, yshift=2pt] at (ext_left.north west) {External Sources};
   
-  \node[srcbox] (s1) at (-3.7, -1.2) {Last.fm};
-  \node[srcbox] (s2) at (-2.4, -1.2) {\faYoutube};
-  \node[srcbox] (s3) at (-1.1, -1.2) {\faReddit};
-  \node[srcbox] (s4) at (-3.0, -1.9) {Deezer};
-  \node[srcbox] (s5) at (-1.8, -1.9) {\faSpotify};
+  \node[srcbox] (s1) at (-3.4, -1.2) {Last.fm};
+  \node[srcbox] (s2) at (-1.4, -1.2) {\faYoutube};
+  \node[srcbox] (s3) at (-3.4, -1.9) {\faReddit};
+  \node[srcbox] (s4) at (-1.4, -1.9) {Deezer};
 
   \node[draw=mgray!50, dashed, rounded corners=3pt, minimum width=7.5cm, minimum height=1.8cm] (ext_right) at (2.4, -1.55) {};
   \node[font=\scriptsize\color{mgray}, anchor=south east, xshift=-4pt, yshift=2pt] at (ext_right.north east) {AI Models};
@@ -341,13 +369,12 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
 \begin{center}
 \begin{tikzpicture}[every node/.style={font=\small}, x=2.5cm, y=0.6cm]
   % Sources
-  \node[srcbox, minimum width=2cm] (s1) at (0, 2) {Last.fm};
-  \node[srcbox, minimum width=2cm] (s2) at (0, 1) {\faYoutube~YouTube};
-  \node[srcbox, minimum width=2cm] (s3) at (0, 0) {\faReddit~Reddit};
-  \node[srcbox, minimum width=2cm] (s4) at (0, -1) {Deezer};
-  \node[srcbox, minimum width=2cm] (s5) at (0, -2) {\faSpotify~Spotify};
+  \node[srcbox, minimum width=2cm] (s1) at (0, 1.5) {Last.fm};
+  \node[srcbox, minimum width=2cm] (s2) at (0, 0.5) {\faYoutube~YouTube};
+  \node[srcbox, minimum width=2cm] (s3) at (0, -0.5) {\faReddit~Reddit};
+  \node[srcbox, minimum width=2cm] (s4) at (0, -1.5) {Deezer};
   
-  \node[font=\tiny\color{mgray}, below=2pt of s5] {miễn phí, không cần key};
+  \node[font=\tiny\color{mgray}, below=2pt of s4] {miễn phí, không cần key};
 
   % Scheduler
   \node[darkbox, align=center] (sched) at (1.8, 0) {Scheduler\\(APScheduler)};
@@ -363,7 +390,7 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
   \draw[arr] (s1.east) to[out=0, in=180] node[pos=0.45, above, sloped, font=\scriptsize, fill=white, inner sep=1pt] {poll 6h} (sched.west);
   
   \draw [decorate, decoration={brace, amplitude=4pt}, thick, mgray] 
-    ([xshift=4pt, yshift=2pt]s2.north east) -- ([xshift=4pt, yshift=-2pt]s5.south east) 
+    ([xshift=4pt, yshift=2pt]s2.north east) -- ([xshift=4pt, yshift=-2pt]s4.south east) 
     node [midway, right=4pt, font=\scriptsize\color{mgray}] (brace_node) {on-demand};
 
   \draw[arr] (brace_node.east) to[out=0, in=180] (sched.west);
@@ -455,22 +482,24 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
 % ─── Slide 6: Hồ Sơ Cá Nhân ──────────────────────────────────────────────────
 \begin{frame}{Hồ Sơ Cá Nhân}
 
-\begin{columns}[T]
-\column{0.48\textwidth}
-\begin{center}
-  \imgplaceholder[\linewidth]{Trang User Management\\\% [IMG] profile-page.png}
-\end{center}
-
-\column{0.48\textwidth}
-\vspace{0.6cm}
-\begin{itemize}\footnotesize\setlength\itemsep{12pt}
-  \item \textbf{Quản trị hồ sơ toàn diện:}\\ Tích hợp Portal quản lý tài khoản trực quan cho End-user.
-  \item \textbf{Định danh liên kết (Connected Accounts):}\\ Kiểm soát và đồng bộ hóa luồng đăng nhập SSO (Google, Github) một cách minh bạch, an toàn.
-  \item \textbf{Mở rộng phân quyền (Future-proof RBAC):}\\ Nền móng CSDL người dùng sẵn sàng triển khai phân quyền theo vai trò (Admin / Viewer).
+\vspace{0.1cm}
+\begin{itemize}\footnotesize\setlength\itemsep{4pt}
+  \item \textbf{Quản trị hồ sơ toàn diện:} Tích hợp Portal quản lý tài khoản trực quan cho End-user.
+  \item \textbf{Định danh liên kết (Connected Accounts):} Kiểm soát và đồng bộ hóa luồng đăng nhập SSO (Google, Github) một cách minh bạch, an toàn.
+  \item \textbf{Mở rộng phân quyền (Future-proof RBAC):} Nền móng CSDL người dùng sẵn sàng triển khai phân quyền theo vai trò (Admin / Viewer).
 \end{itemize}
-\end{columns}
 
-\takeaway{Nền móng người dùng sẵn sàng mở rộng — từ đăng nhập đến phân quyền.}
+\vspace{0.1cm}
+\begin{columns}[c]
+\column{0.35\textwidth}
+  \begin{center}
+    \includegraphics[width=\linewidth,height=0.58\textheight,keepaspectratio]{slides/figures/sign-in.png}
+  \end{center}
+\column{0.62\textwidth}
+  \begin{center}
+    \includegraphics[width=\linewidth,height=0.58\textheight,keepaspectratio]{slides/figures/personal-info.png}
+  \end{center}
+\end{columns}
 
 \end{frame}
 
@@ -483,7 +512,7 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
 \begin{columns}[T]
 \column{0.58\textwidth}
   % [IMG] dashboard-fullpage.png — chụp full trang /dashboard ở light mode
-  \imgplaceholder[0.96\linewidth]{Trang /dashboard — Global Top 50 + MIS + AI Briefing}
+  \includegraphics[width=\linewidth,height=0.65\textheight,keepaspectratio]{slides/figures/dashboard.png}
 
 \column{0.4\textwidth}
   \vspace{0.2cm}
@@ -511,72 +540,66 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
 % ─── Slide 7: Daily Briefing & Phân Tích Cảm Xúc ─────────────────────────────
 \begin{frame}{Daily Briefing \& Phân Tích Cảm Xúc}
 
+\begin{columns}[c]
+\column{0.28\textwidth}
 \begin{center}
-\begin{tikzpicture}[every node/.style={font=\small}, x=2.0cm, y=1.2cm]
-  \node[srcbox] (s1) at (0, 1) {Last.fm Top Charts};
-  \node[srcbox] (s2) at (0, 0) {Reddit Posts};
-  \node[srcbox] (s3) at (0, -1) {Deezer TikTok};
+\begin{tikzpicture}[every node/.style={font=\footnotesize}, y=-1.3cm, scale=0.9, transform shape]
+  \node[srcbox] (s1) at (-1.5, 0) {Last.fm};
+  \node[srcbox] (s2) at (0, 0) {Reddit};
+  \node[srcbox] (s3) at (1.5, 0) {Deezer};
   
-  \node[aibox, align=center] (vader) at (1.4, 0) {VADER NLP};
-  \node[font=\tiny\color{mgray}, below=2pt of vader] {Neg / Neu / Pos};
+  \node[aibox, align=center] (vader) at (0, 1) {VADER NLP};
+  \node[font=\tiny\color{mgray}, below=1pt of vader] {Neg/Neu/Pos};
   
-  \node[pbox] (json) at (2.8, 0) {JSON tổng hợp};
+  \node[pbox] (json) at (0, 2.2) {JSON tổng hợp};
   
-  \node[aibox, minimum height=0.8cm, align=center] (gemini) at (4.3, 0) {Gemini 3.1\\Flash-Lite};
+  \node[aibox, align=center] (gemini) at (0, 3.2) {Gemini 3.1};
   
-  \node[gbox, align=center] (out) at (5.7, 0) {Bản tin\\có cấu trúc};
+  \node[gbox, align=center] (out) at (0, 4.2) {Bản tin};
   
   \draw[arr] (s2) -- (vader);
   \draw[arr] (vader) -- (json);
-  \draw[arr] (s1.east) -- (json.west);
-  \draw[arr] (s3.east) -- (json.west);
+  \draw[arr, rounded corners=4pt] (s1.south) |- (json.west);
+  \draw[arr, rounded corners=4pt] (s3.south) |- (json.east);
   \draw[arr] (json) -- (gemini);
   \draw[arr] (gemini) -- (out);
 \end{tikzpicture}
 \end{center}
 
-\vspace{0.4cm}
-\begin{columns}[T]
-\column{0.48\textwidth}
-\begin{primarybox}
-  \textbf{Đầu vào}\\[4pt]
-  \footnotesize
-  Top Charts + Reddit mentions + điểm sentiment $\to$ đóng gói JSON.
-\end{primarybox}
+\column{0.70\textwidth}
+\begin{itemize}\footnotesize\setlength\itemsep{8pt}
+  \item \textbf{Đầu vào:} Top Charts + Reddit (VADER Sentiment) $\to$ Đóng gói JSON.
+  \item \textbf{Đầu ra:} Bản tin tự động (Tổng quan, Viral Alert, Dự báo tuần tới).
+\end{itemize}
 
-\column{0.48\textwidth}
-\begin{goodbox}
-  \textbf{Đầu ra (5 mục)}\\[4pt]
-  \footnotesize
-  Tổng quan $\cdot$ TikTok Viral Alert $\cdot$ Dự báo tuần tới\\[3pt]
-  \tiny\color{mgray} \itshape Có fallback khi Gemini hết quota.
-\end{goodbox}
+\vspace{0.3cm}
+\begin{center}
+  \includegraphics[width=\linewidth,height=0.7\textheight,keepaspectratio]{slides/figures/daily-briefing.png}
+\end{center}
 \end{columns}
-
-\takeaway{VADER chấm cảm xúc, Gemini viết bản tin — raw data thành insight tự động.}
 
 \end{frame}
 
 % ─── Slide 9: Trực Quan Hóa & Phân Tích ──────────────────────────────────────
 \begin{frame}{Trực Quan Hóa \& Phân Tích}
 
-\begin{columns}[T]
-\column{0.48\textwidth}
 \begin{center}
-  \imgplaceholder[\linewidth]{Giao diện trực quan hóa đa nguồn\\\% [IMG] visualization-analysis.png}
+  \includegraphics[width=\linewidth,height=0.62\textheight,keepaspectratio]{slides/figures/market-insight.png}
 \end{center}
 
-\column{0.48\textwidth}
-\vspace{0.4cm}
-\begin{itemize}\footnotesize\setlength\itemsep{10pt}
-  \item \textbf{Multi-source Tracking:}
-    \begin{itemize}\scriptsize\setlength\itemsep{4pt}
-      \item Last.fm $\to$ Top Tracks \& phân phối thể loại.
-      \item YouTube $\to$ Time-series View (6 ngày).
-      \item Deezer TikTok $\to$ Viral Ranking Heatmap.
-    \end{itemize}
-  \item \textbf{Hit Prediction \& Giải Thích Dự Đoán:}\\
-    Radar Chart: Growth $\cdot$ Buzz $\cdot$ Sentiment $\cdot$ Viral $\cdot$ Hit Prob.
+\vspace{-0.2cm}
+\begin{columns}[T]
+\column{0.32\textwidth}
+\begin{itemize}\scriptsize\setlength\itemsep{2pt}
+  \item \textbf{Multi-source:}\\ Last.fm, YT, Deezer.
+\end{itemize}
+\column{0.32\textwidth}
+\begin{itemize}\scriptsize\setlength\itemsep{2pt}
+  \item \textbf{Hit Prediction:}\\ Radar, Buzz, Hit Score.
+\end{itemize}
+\column{0.32\textwidth}
+\begin{itemize}\scriptsize\setlength\itemsep{2pt}
+  \item \textbf{Realtime:}\\ Cập nhật thời gian thực.
 \end{itemize}
 \end{columns}
 
@@ -587,22 +610,29 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
 % ─── Slide 10: Phân Phối Dữ Liệu ─────────────────────────────────────────────
 \begin{frame}{Phân Phối Dữ Liệu}
 
-\begin{columns}[T]
-\column{0.55\textwidth}
+\begin{columns}[c]
+\column{0.65\textwidth}
 \begin{center}
-  \imgplaceholder[\linewidth]{Biểu đồ phân phối long-tail\\\% [IMG] pareto-distribution.png}
+  \includegraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{slides/figures/phan-phoi-dl.png}
 \end{center}
 
-\column{0.43\textwidth}
-\vspace{0.4cm}
-\begin{itemize}\footnotesize\setlength\itemsep{10pt}
-  \item \textbf{Pareto Distribution (Long-tail):}\\ Top 1 chiếm áp đảo $\to$ quy luật 80/20 rõ nét.
-  \item \textbf{Cross-platform Tracking:}\\ YouTube Views \& Likes; Reddit r/Music Upvotes \& Comments.
-  \item \textbf{Sentiment Bar:}\\ Tích cực (teal) / Tiêu cực (coral) $\to$ Phát hiện sớm khủng hoảng truyền thông.
+\column{0.33\textwidth}
+\begin{itemize}\footnotesize\setlength\itemsep{8pt}
+  \item \textbf{Pareto Distribution:}\\ Top 1 chiếm áp đảo $\to$ Quy luật 80/20.
+  \item \textbf{Cross-platform:}\\ Tương quan YouTube Views \& Reddit Upvotes.
+  \item \textbf{Sentiment Bar:}\\ Phát hiện sớm khủng hoảng truyền thông.
 \end{itemize}
+
+\vspace{0.4cm}
+\begin{accentbox}
+  \scriptsize \textbf{Data Insight:}\\
+  Dữ liệu âm nhạc có độ lệch (skewness) rất lớn. Việc phát hiện phân phối giúp quyết định phương pháp \textbf{Log-Transform} khi đưa vào AI.
+\end{accentbox}
+
 \end{columns}
 
-\takeaway{Dữ liệu nhạc có dạng long-tail — vài bài hút phần lớn lượt nghe.}
+\vspace{0.2cm}
+\takeaway{Trực quan hoá phân phối không chỉ để báo cáo, mà là cơ sở để thiết kế thuật toán xử lý nhiễu (outliers).}
 
 \end{frame}
 
@@ -612,10 +642,10 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
 % ─── Slide 11: World Map — Phân Cụm Thị Hiếu (K-Means) ───────────────────────
 \begin{frame}{World Map — Phân Cụm K-Means}
 
-\begin{columns}[T]
-\column{0.46\textwidth}
+\begin{columns}[c]
+\column{0.36\textwidth}
   \begin{center}
-  \begin{tikzpicture}[every node/.style={font=\scriptsize}, y=-0.9cm]
+  \begin{tikzpicture}[every node/.style={font=\scriptsize}, y=-0.9cm, scale=0.85, transform shape]
     \node[srcbox, align=center] (b1) at (0, 0) {Deezer chart + Last.fm tags\\(89 quốc gia)};
     \node[pbox] (b2) at (0, 1.2) {Vector 16 thể loại / quốc gia};
     \node[aibox] (b3) at (0, 2.2) {K-Means (k=6)};
@@ -629,25 +659,23 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
   \end{tikzpicture}
   
   \vspace{0.2cm}
-  \tiny\color{mgray} \itshape Cache map\_cache.json — lần đầu ~60--90s, sau đó tức thì.
+  \tiny\color{mgray} \itshape Cache map\_cache.json chạy tức thì.
   \end{center}
-
-\column{0.48\textwidth}
-  % [IMG] worldmap-page.png — chụp /map có popup 1 quốc gia
-  \imgplaceholder[\linewidth]{Trang /map — bản đồ Leaflet tô màu theo cụm}
   
   \vspace{0.1cm}
+  \begin{accentbox}
+    \scriptsize \textbf{Dị biệt:} VN thuộc cụm Latin-dominant.
+  \end{accentbox}
+
+\column{0.62\textwidth}
   \begin{center}
-    \tiny\color{mgray} \itshape Click quốc gia $\to$ AI Cultural Insight (Gemini) giải thích nguyên nhân văn hóa.
+    \includegraphics[width=\linewidth,height=0.7\textheight,keepaspectratio]{slides/figures/global-map.png}
+  \end{center}
+  \vspace{0.1cm}
+  \begin{center}
+    \tiny\color{mgray} \itshape Click quốc gia $\to$ AI Cultural Insight giải thích văn hóa.
   \end{center}
 \end{columns}
-
-\vspace{0.1cm}
-\begin{accentbox}
-  \footnotesize Phát hiện dị biệt: Việt Nam rơi vào cụm Latin-dominant — Gemini lý giải.
-\end{accentbox}
-
-\takeaway{K-Means gom 89 quốc gia theo gu nhạc — bản đồ kể chuyện văn hóa.}
 
 \end{frame}
 
@@ -655,15 +683,15 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
 \begin{frame}{Trending — Phát Hiện Viral}
 
 \begin{columns}[T]
-\column{0.5\textwidth}
+\column{0.45\textwidth}
   \begin{center}
-  \begin{tikzpicture}[every node/.style={font=\scriptsize}]
+  \begin{tikzpicture}[every node/.style={font=\scriptsize}, scale=0.9, transform shape]
     \node[srcbox] (s1) at (0, 0.9) {YouTube growth};
     \node[srcbox] (s2) at (0, 0) {Reddit mentions};
     \node[srcbox] (s3) at (0, -0.9) {YouTube comments};
     
-    \node[aibox] (viral) at (2.8, 0) {Viral Score};
-    \node[gbox] (out) at (5, 0) {0--100};
+    \node[aibox] (viral) at (2.6, 0) {Viral Score};
+    \node[gbox] (out) at (4.5, 0) {0--100};
     
     \draw[arr] (s1.east) -- (viral.west);
     \draw[arr] (s2.east) -- (viral.west);
@@ -672,53 +700,44 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
   \end{tikzpicture}
   \end{center}
   
-  \vspace{0.4cm}
+  \vspace{0.2cm}
   \begin{primarybox}
     \footnotesize Viral = 50\% $\cdot$ YouTube + 30\% $\cdot$ Reddit + 20\% $\cdot$ Comments
   \end{primarybox}
 
-\column{0.48\textwidth}
-  \begin{itemize}\footnotesize\setlength\itemsep{8pt}
-    \item Z-score trên chuỗi tăng view — phát hiện spike (ngưỡng 2.5).
-    \item Isolation Forest — đánh dấu bài bất thường trong batch.
-    \item Xếp hạng theo Velocity (vận tốc tăng), không chỉ tổng view.
+\column{0.53\textwidth}
+  \begin{itemize}\footnotesize\setlength\itemsep{4pt}
+    \item Z-score chuỗi tăng view — phát hiện spike.
+    \item Isolation Forest — đánh dấu bài bất thường.
+    \item Xếp hạng theo Velocity (vận tốc tăng).
   \end{itemize}
   
-  \vspace{0.2cm}
+  \vspace{0.1cm}
+  \begin{center}
+    \includegraphics[width=\linewidth,height=3.5cm,keepaspectratio]{slides/figures/visualize-trending.png}
+  \end{center}
+  
+  \vspace{0.1cm}
   \begin{accentbox}
-    \footnotesize \faQuestionCircle~ Nút "Tại sao viral?" — Gemini tổng hợp sự kiện / trend TikTok.
+    \footnotesize \faQuestionCircle~ "Tại sao viral?" — Gemini tổng hợp sự kiện.
   \end{accentbox}
 \end{columns}
-
-\takeaway{Z-score + Isolation Forest + Gemini — phát hiện và giải thích viral.}
 
 \end{frame}
 
 % ─── Slide 13: Social Listening ──────────────────────────────────────────────
 \begin{frame}{Social Listening}
 
-\begin{columns}[T]
-\column{0.55\textwidth}
-\begin{center}
-  \imgplaceholder[\linewidth]{Trang Social Listening\\\% [IMG] social-listening.png}
-\end{center}
-
-\column{0.43\textwidth}
-\vspace{0.4cm}
-\begin{itemize}\footnotesize\setlength\itemsep{10pt}
-  \item \textbf{Multi-subreddit:}\\ Theo dõi r/Music, r/kpop, r/hiphopheads.
-  \item \textbf{VADER NLP:}\\ Phân loại Pos / Neu / Neg \& tổng hợp Mentions 24h.
-  \item \textbf{Gemini Contextual AI Insight:}\\ 
-    \begin{itemize}\scriptsize\setlength\itemsep{4pt}
-      \item Chủ đề chính.
-      \item Mức độ quan tâm.
-      \item Góc nhìn cộng đồng.
-      \item Tác động truyền thông.
-    \end{itemize}
+\vspace{0.1cm}
+\begin{itemize}\footnotesize\setlength\itemsep{4pt}
+  \item \textbf{Multi-subreddit \& VADER NLP:} Theo dõi r/Music, r/kpop... Phân loại Pos / Neu / Neg \& Mentions 24h.
+  \item \textbf{Gemini AI Insight:} Phân tích chủ đề chính, mức độ quan tâm, góc nhìn cộng đồng.
 \end{itemize}
-\end{columns}
 
-\takeaway{Đo nhiệt cộng đồng và lấy insight tự động từ hàng ngàn bình luận.}
+\vspace{0.1cm}
+\begin{center}
+  \includegraphics[width=0.9\linewidth,height=0.6\textheight,keepaspectratio]{slides/figures/social-listening.png}
+\end{center}
 
 \end{frame}
 
@@ -728,68 +747,254 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
 % ─── Slide 14: Dự Đoán Hit ───────────────────────────────────────────────────
 \begin{frame}{Dự Đoán Hit}
 
-\begin{columns}[T]
-\column{0.55\textwidth}
+\begin{columns}[c]
+\column{0.45\textwidth}
 \begin{center}
-  \imgplaceholder[\linewidth]{Form nhập \& Kết quả dự đoán\\\% [IMG] predict-page.png}
+\begin{tikzpicture}[
+    every node/.style={font=\scriptsize, rounded corners=2pt},
+    arr/.style={->, >=stealth, thick, mgray},
+    box/.style={align=center, minimum height=0.6cm},
+    scale=0.62, transform shape, y=-0.9cm, x=1.5cm
+  ]
+  
+  \node[box, draw=blue!70!black, fill=blue!10, text=blue!70!black, text width=1.5cm] (deezer) at (-2.25, 0) {\textbf{Deezer}\\ \tiny BPM, energy};
+  \node[box, draw=red!80!black, fill=red!10, text=red!80!black, text width=1.5cm] (yt) at (-0.75, 0) {\textbf{YouTube}\\ \tiny Views, likes};
+  \node[box, draw=orange!90!black, fill=orange!10, text=orange!90!black, text width=1.5cm] (reddit) at (0.75, 0) {\textbf{Reddit}\\ \tiny Posts, sent.};
+  \node[box, draw=green!50!black, fill=green!10, text=green!50!black, text width=1.5cm] (lastfm) at (2.25, 0) {\textbf{Last.fm}\\ \tiny Scrobbles};
+
+  \node[draw=mgray!50, dashed, rounded corners=4pt, inner sep=8pt, fit={(deezer.north west) (lastfm.south east) (0, 1.3)}] (pipeline) {};
+  \node[fill=white, text=mgray, font=\tiny, right=2pt] at (pipeline.north west) {Feature pipeline};
+
+  \node[box, draw=mprimary, fill=mprimary!10, text=mprimary, minimum width=7cm, inner sep=4pt] (fvec) at (0, 1.4) {\textbf{Feature vector}};
+
+  \node[box, draw=violet!80!black, fill=violet!10, text=violet!80!black, minimum width=4.5cm] (xgb) at (0, 2.6) {\textbf{XGBoost .pkl}\\ \tiny Embedded $\cdot$ real-time inference};
+
+  \node[box, draw=teal, fill=teal!10, text=teal!70!black, minimum width=4.5cm] (prob) at (0, 3.8) {\textbf{Probability score}\\ \tiny e.g. 44.9\% $\cdot$ Watch / Low conf.};
+
+  \node[box, draw=green!60!black, fill=green!10, text=green!60!black, text width=2.8cm] (hit) at (-1.5, 5.2) {\textbf{Hit / Not Hit}\\ \tiny Label + risk tier};
+  \node[box, draw=red!60!black, fill=red!10, text=red!60!black, text width=2.8cm] (audio) at (1.5, 5.2) {\textbf{Audio preview}\\ \tiny Deezer API $\cdot$ stream};
+
+  \node[box, draw=mprimary, fill=mprimary!10, text=mprimary, minimum width=4.5cm] (ui) at (0, 6.6) {\textbf{Web App UI}\\ \tiny Score $\cdot$ label $\cdot$ risk $\cdot$ player};
+
+  \node[box, draw=mgray, fill=mgray!10, text=mgray!80!black, minimum width=3cm, rounded corners=10pt] (user) at (0, 7.8) {User insight};
+
+  \draw[arr] (deezer) -- (deezer |- fvec.north);
+  \draw[arr] (yt) -- (yt |- fvec.north);
+  \draw[arr] (reddit) -- (reddit |- fvec.north);
+  \draw[arr] (lastfm) -- (lastfm |- fvec.north);
+
+  \draw[arr] (fvec) -- (xgb);
+  \draw[arr] (xgb) -- (prob);
+
+  \draw[arr] (prob) -- (0, 4.5) -| (hit);
+  \draw[arr] (prob) -- (0, 4.5) -| (audio);
+
+  \draw[arr] (hit) |- (0, 5.9) -- (ui);
+  \draw[arr] (audio) |- (0, 5.9) -- (ui);
+
+  \draw[arr] (ui) -- (user);
+
+\end{tikzpicture}
 \end{center}
 
-\column{0.43\textwidth}
-\vspace{0.4cm}
-\begin{itemize}\footnotesize\setlength\itemsep{10pt}
-  \item \textbf{Model Deployment:}\\ Đưa mô hình XGBoost vào Web App để dự đoán thời gian thực.
-  \item \textbf{Feature Pipeline:}\\ Tự động crawl dữ liệu từ Deezer, YouTube, Reddit, Last.fm khi nhập tên bài hát.
-  \item \textbf{Dự đoán Xác suất:}\\ Output \% xác suất Hit và phân loại rủi ro (Watch / Low confidence).
-  \item \textbf{Tích hợp Đa phương tiện:}\\ Cho phép nghe preview ngay trên Web.
+\column{0.52\textwidth}
+\begin{center}
+  \includegraphics[width=\linewidth,height=4cm,keepaspectratio]{slides/figures/hit-prediction.png}
+\end{center}
+
+\vspace{0.2cm}
+\begin{minipage}[T]{0.48\linewidth}
+\begin{itemize}\scriptsize\setlength\itemsep{4pt}
+  \item \textbf{Realtime:}\\ Web App dự đoán.
+  \item \textbf{Auto:}\\ Crawl từ 4 nguồn.
 \end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}[T]{0.48\linewidth}
+\begin{itemize}\scriptsize\setlength\itemsep{4pt}
+  \item \textbf{Risk \& Score:}\\ \% Hit \& rủi ro.
+  \item \textbf{Preview:}\\ Nghe nhạc 30s.
+\end{itemize}
+\end{minipage}
 \end{columns}
 
-\takeaway{Nhập 1 URL $\to$ quy nạp features $\to$ XGBoost dự đoán Hit/Flop tức thời.}
+\vspace{0.2cm}
+\takeaway{Nhập 1 URL $\to$ tự động trích xuất đặc trưng $\to$ XGBoost dự đoán Hit/Flop theo thời gian thực.}
 
 \end{frame}
 
 % ─── Slide 15: Giải Thích Dự Đoán ────────────────────────────────────────────
 \begin{frame}{Giải Thích Dự Đoán}
 
-\begin{columns}[T]
-\column{0.55\textwidth}
+\begin{columns}[c]
+\column{0.48\textwidth}
 \begin{center}
-  \imgplaceholder[\linewidth]{Radar Chart \& Lời giải thích\\\% [IMG] explain-predict.png}
+\begin{tikzpicture}[
+    every node/.style={font=\scriptsize, rounded corners=2pt},
+    arr/.style={->, >=stealth, thick, mgray},
+    box/.style={align=center, minimum height=0.5cm},
+    scale=0.48, transform shape, y=-0.85cm, x=1.5cm
+  ]
+
+  \node[box, draw=mgray, fill=mgray!10, text=mgray!80!black, minimum width=4cm, rounded corners=10pt] (xgb) at (0, 0) {\textbf{XGBoost output $\cdot$ 44.9\%}};
+
+  \node[box, draw=blue!70!black, fill=blue!10, text=blue!70!black, text width=1.8cm] (shap) at (-2, 1.8) {\textbf{SHAP weights}\\ \tiny Feature import.};
+  \node[box, draw=blue!70!black, fill=blue!10, text=blue!70!black, text width=1.8cm] (rank) at (0, 1.8) {\textbf{Feature rank}\\ \tiny Top drivers};
+  \node[box, draw=blue!70!black, fill=blue!10, text=blue!70!black, text width=1.8cm] (split) at (2, 1.8) {\textbf{Score split}\\ \tiny +/- contributions};
+  
+  \node[draw=mgray!50, dashed, rounded corners=4pt, inner sep=6pt, fit={(shap.north west) (split.south east)}] (box1) {};
+  \node[text=mgray, font=\tiny, anchor=south west] at (box1.north west) {Giải mã hộp đen};
+
+  \begin{scope}[shift={(0, 4.5)}, x=1cm, y=1cm]
+    \foreach \a in {18,90,162,234,306} {
+      \draw[mgray!50] (0,0) -- (\a:1.2);
+    }
+    \draw[fill=blue!20, opacity=0.8, draw=blue, thick]
+      (90:1.0) -- (18:0.7) -- (306:1.1) -- (234:0.6) -- (162:0.8) -- cycle;
+    \fill[blue] (90:1.0) circle (2pt);
+    \fill[blue] (18:0.7) circle (2pt);
+    \fill[blue] (306:1.1) circle (2pt);
+    \fill[blue] (234:0.6) circle (2pt);
+    \fill[blue] (162:0.8) circle (2pt);
+    \node[font=\tiny, above] (r1) at (90:1.2) {Memeability};
+    \node[font=\tiny, right] (r2) at (18:1.2) {Emotional hook};
+    \node[font=\tiny, anchor=north west] (r3) at (306:1.2) {Danceability};
+    \node[font=\tiny, anchor=north east] (r4) at (234:1.2) {Lyrics};
+    \node[font=\tiny, left] (r5) at (162:1.2) {Shock value};
+  \end{scope}
+  \node[draw=mgray!50, dashed, rounded corners=4pt, inner xsep=10pt, inner ysep=8pt, fit={(r1) (r2) (r3) (r4) (r5)}] (box2) {};
+  \node[text=mgray, font=\tiny, anchor=south west] at (box2.north west) {Radar đa chiều};
+  \node[minimum width=2cm, minimum height=2cm] (radar) at (0, 4.5) {};
+
+  \node[box, draw=green!50!black, fill=green!10, text=green!50!black, text width=2cm] (gemini) at (-1.5, 7.5) {\textbf{Gemini}\\ \tiny Reads SHAP + radar};
+  \node[box, draw=teal, fill=teal!10, text=teal!70!black, text width=3cm] (semantic) at (1.5, 7.5) {\textbf{Semantic narrative}\\ \tiny Why 44.9\%? $\cdot$ plain lang.};
+  \draw[arr] (gemini) -- (semantic);
+  \node[draw=mgray!50, dashed, rounded corners=4pt, inner sep=6pt, fit={(gemini.north west) (semantic.south east)}] (box3) {};
+  \node[text=mgray, font=\tiny, anchor=south west] at (box3.north west) {LLM phiên dịch};
+
+  \node[box, draw=orange!80!black, fill=orange!10, text=orange!80!black, minimum width=5cm] (risk) at (0, 9.2) {\textbf{Risk tier}\\ \tiny Watch $\cdot$ Low confidence $\cdot$ 44.9\%};
+
+  \node[box, draw=red!70!black, fill=red!10, text=red!70!black, text width=1.8cm] (act1) at (-2, 11) {\textbf{TikTok / Shorts}\\ \tiny Push campaign};
+  \node[box, draw=red!70!black, fill=red!10, text=red!70!black, text width=1.8cm] (act2) at (0, 11) {\textbf{Remix hook}\\ \tiny Boost Emotion};
+  \node[box, draw=red!70!black, fill=red!10, text=red!70!black, text width=1.8cm] (act3) at (2, 11) {\textbf{Playlist pitch}\\ \tiny Target editorial};
+
+  \node[box, draw=mgray, fill=mgray!10, text=mgray!80!black, minimum width=5cm] (repredict) at (0, 12.4) {\textbf{Re-predict loop}\\ \tiny Apply actions $\to$ re-score $\to$ iterate};
+  
+  \node[box, draw=mgray, fill=mgray!20, text=mgray!90!black, minimum width=4cm, rounded corners=10pt] (decision) at (0, 13.6) {\textbf{Decision $\cdot$ informed release}};
+
+  \node[draw=mgray!50, dashed, rounded corners=4pt, inner sep=6pt, fit={(act1.north west) (act3.south east) (decision.south)}] (box4) {};
+  \node[text=mgray, font=\tiny, anchor=south west] at (box4.north west) {Chiến lược hành động};
+
+  \draw[arr] (xgb) -- (rank);
+  \draw[arr] (xgb) -- (0,0.8) -| (shap);
+  \draw[arr] (xgb) -- (0,0.8) -| (split);
+
+  \draw[arr] (rank) -- (radar);
+  
+  \draw[arr] (radar) -- (0, 6.7) -| (gemini);
+
+  \draw[arr] (0, 8.2) -- (risk);
+
+  \draw[arr] (risk) -- (act2);
+  \draw[arr] (risk) -- (0, 10.1) -| (act1);
+  \draw[arr] (risk) -- (0, 10.1) -| (act3);
+
+  \draw[arr] (act1) |- (0, 11.7) -- (repredict);
+  \draw[arr] (act2) -- (repredict);
+  \draw[arr] (act3) |- (0, 11.7) -- (repredict);
+
+  \draw[arr] (repredict) -- (decision);
+
+\end{tikzpicture}
 \end{center}
 
-\column{0.43\textwidth}
-\vspace{0.4cm}
-\begin{itemize}\footnotesize\setlength\itemsep{10pt}
-  \item \textbf{Chuyển hóa kết quả:}\\ Thành các phân tích ngữ nghĩa dễ hiểu cho con người.
-  \item \textbf{Radar 5 trục:}\\ Memeability, Emotional Hook, Danceability, Lyrics và Shock Value.
-  \item \textbf{AI Phiên dịch:}\\ Gemini đọc trọng số XGBoost để giải thích bằng lời văn: Tại sao đạt mức này?
-  \item \textbf{Đề xuất hành động:}\\ Trực tiếp đưa ra tư vấn chiến lược cho người dùng.
+\column{0.48\textwidth}
+\begin{center}
+  \includegraphics[width=\linewidth,height=3.2cm,keepaspectratio]{slides/figures/visualize-hit.png}
+\end{center}
+
+\vspace{0.2cm}
+\begin{minipage}[T]{0.48\linewidth}
+\begin{itemize}\scriptsize\setlength\itemsep{4pt}
+  \item \textbf{Chuyển hóa:}\\ Phân tích dễ hiểu.
+  \item \textbf{Radar:}\\ Radar 5 trục.
 \end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}[T]{0.48\linewidth}
+\begin{itemize}\scriptsize\setlength\itemsep{4pt}
+  \item \textbf{Phiên dịch:}\\ Gemini đọc trọng số.
+  \item \textbf{Đề xuất:}\\ Tư vấn chiến lược.
+\end{itemize}
+\end{minipage}
 \end{columns}
 
-\takeaway{AI không chỉ báo số, mà còn chỉ ra nguyên nhân và hướng hành động.}
+\vspace{0.2cm}
+\takeaway{AI không chỉ báo số, mà còn giải thích nguyên nhân và gợi ý hành động.}
 
 \end{frame}
 
 % ─── Slide 16: AI Chat ───────────────────────────────────────────────────────
 \begin{frame}{AI Chat}
 
-\begin{columns}[T]
-\column{0.55\textwidth}
+\begin{columns}[c]
+\column{0.40\textwidth}
 \begin{center}
-  \imgplaceholder[\linewidth]{Agent chat \& Thought trace\\\% [IMG] chat-page.png}
+\begin{tikzpicture}[
+    every node/.style={font=\scriptsize, rounded corners=2pt},
+    arr/.style={->, >=stealth, thick, mgray},
+    box/.style={align=center, minimum height=0.6cm},
+    scale=0.42, transform shape, y=-1.1cm, x=1.5cm
+  ]
+
+  \node[box, draw=teal, fill=teal!10, text=teal!80!black, minimum width=6cm, rounded corners=12pt] (user) at (0, 0) {\textbf{Người dùng}\\ \tiny "Tại sao APT trending? Verify từ web"};
+
+  \node[box, draw=purple!80!black, fill=purple!10, text=purple!80!black, minimum width=6cm] (t1) at (0, 1.8) {\textbf{Thought 1 — Lên kế hoạch}\\ \tiny "Cần tìm lý do bài APT viral trên web..."};
+
+  \node[box, draw=blue!70!black, fill=blue!10, text=blue!70!black, minimum width=6cm] (a1) at (0, 3) {\textbf{Action 1 — Gọi tool}\\ \tiny \texttt{web\_search("why is APT trending...")}};
+
+  \node[box, draw=red!70!black, fill=red!10, text=red!70!black, minimum width=6cm] (o1) at (0, 4.2) {\textbf{Observation 1 — Lỗi môi trường}\\ \tiny Error: duckduckgo chưa được cài đặt};
+
+  \node[box, draw=orange!90!black, fill=orange!10, text=orange!90!black, minimum width=6cm] (t2) at (0, 5.4) {\textbf{Thought 2 — Tự phục hồi}\\ \tiny "Dùng kiến thức nội bộ thay thế..."};
+
+  \node[box, draw=mgray, fill=white, dashed, text=mgray, text width=1.2cm] (fallback) at (3.8, 5.4) {Graceful\\fallback};
+  \draw[mgray, dashed] (fallback) -- (t2);
+
+  \node[box, draw=green!60!black, fill=green!10, text=green!60!black, minimum width=6cm, rounded corners=12pt] (final) at (0, 7.2) {\textbf{Final answer}\\ \tiny Báo cáo 5 lý do APT thành công};
+
+  \node[draw=mgray!50, dashed, rounded corners=6pt, inner sep=10pt, fit={(t1.north west) (t2.south east) (fallback.east)}] (loop) {};
+  \node[fill=white, text=mgray, font=\tiny, right=2pt] at (loop.north west) {ReAct loop};
+
+  \draw[arr] (user) -- (t1);
+  \draw[arr] (t1) -- (a1);
+  \draw[arr] (a1) -- (o1);
+  \draw[arr] (o1) -- (t2);
+  \draw[arr] (t2) -- (final);
+
+  \begin{scope}[shift={(0, 8.8)}, x=1cm, y=1cm, every node/.style={font=\tiny, anchor=west}]
+    \filldraw[fill=purple!10, draw=purple!80!black] (-4.5, -0.1) rectangle (-4.2, 0.2); \node at (-4.1, 0.05) {Thought};
+    \filldraw[fill=blue!10, draw=blue!70!black] (-2.5, -0.1) rectangle (-2.2, 0.2); \node at (-2.1, 0.05) {Action};
+    \filldraw[fill=red!10, draw=red!70!black] (-0.5, -0.1) rectangle (-0.2, 0.2); \node at (-0.1, 0.05) {Observation (lỗi)};
+    \filldraw[fill=orange!10, draw=orange!90!black] (2.0, -0.1) rectangle (2.3, 0.2); \node at (2.4, 0.05) {Fallback};
+    \filldraw[fill=green!10, draw=green!60!black] (4.0, -0.1) rectangle (4.3, 0.2); \node at (4.4, 0.05) {Final answer};
+  \end{scope}
+
+\end{tikzpicture}
 \end{center}
 
-\column{0.43\textwidth}
-\vspace{0.4cm}
-\begin{itemize}\footnotesize\setlength\itemsep{10pt}
-  \item \textbf{Reasoning + Acting:}\\ Biến LLM thành Agent suy luận logic và tự gọi Web Search, DB Query.
-  \item \textbf{Graceful Error Handling:}\\ Tự chuyển hướng sang Internal Knowledge khi tool gặp lỗi.
-  \item \textbf{Truy vấn Tự nhiên:}\\ Tương tác trực tiếp với dữ liệu thị trường bằng ngôn ngữ con người.
-\end{itemize}
+\column{0.58\textwidth}
+\begin{center}
+  \includegraphics[width=\linewidth,height=6.2cm,keepaspectratio]{slides/figures/ai-chat.png}
+\end{center}
+
+\vspace{0.1cm}
+\begin{center}
+  {\scriptsize \faRobot~ \textbf{ReAct Agent:} Tự gọi Tool \quad\quad \faWrench~ \textbf{Tự sửa lỗi:} Fallback nội bộ.}
+\end{center}
 \end{columns}
 
-\takeaway{Agent tự phân tích, dùng tool, tự sửa lỗi — vượt giới hạn hỏi đáp tĩnh.}
+\vspace{0.2cm}
+\takeaway{Agent tự phân tích, gọi tool và tự xử lý ngoại lệ — vượt giới hạn hỏi đáp tĩnh.}
 
 \end{frame}
 
@@ -804,32 +1009,28 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
 \begin{goodbox}
   \textbf{ĐIỂM MẠNH}\\[6pt]
   \footnotesize
-  \faCheck~ Tích hợp thành công 5 API âm nhạc lớn.\\[4pt]
-  \faCheck~ Polling \& Cache chạy ổn định, tiết kiệm quota.\\[4pt]
-  \faCheck~ Phân cụm K-Means 89 quốc gia trực quan.\\[4pt]
-  \faCheck~ AI Briefing tự động 100\% qua Gemini.\\[4pt]
-  \faCheck~ Chatbot ReAct Agent xử lý linh hoạt.
+  \faCheck~ Tích hợp đa nguồn: 5 API âm nhạc + AI Gemini trong một hệ thống thống nhất.\\[6pt]
+  \faCheck~ Phân tích toàn diện: Clustering, Prediction, Sentiment, Trend Detection.\\[6pt]
+  \faCheck~ AI Agent tự chủ: ReAct loop tự gọi tool, tự xử lý lỗi, streaming realtime.
 \end{goodbox}
 
 \column{0.50\textwidth}
 \begin{badbox}
-  \textbf{HẠN CHẾ / GIẢ ĐỊNH}\\[6pt]
+  \textbf{HẠN CHẾ}\\[6pt]
   \footnotesize
-  \faTimes~ Spike detection lỗi do \texttt{fake\_history} 4 điểm.\\[4pt]
-  \faTimes~ \texttt{mock\_growth} lấy từ tổng view $\to$ dễ sai lệch.\\[4pt]
-  \faTimes~ Gemini rate limiter chỉ an toàn khi chạy 1 worker.\\[4pt]
-  \faTimes~ \texttt{map\_cache.json} không tự hủy, cần xóa tay.\\[4pt]
-  \faTimes~ API keys commit vào git $\to$ cần rotate bảo mật.
+  \faTimes~ API quota hạn chế: YouTube 10K units/ngày, Gemini 14 req/phút free tier.\\[6pt]
+  \faTimes~ Chưa scale ngang: Scheduler + API chạy cùng process, chỉ 1 worker.\\[6pt]
+  \faTimes~ Chưa có streaming thật: Dữ liệu polling định kỳ, không phải event-driven.
 \end{badbox}
 \end{columns}
 
 \vspace{0.4cm}
 \begin{primarybox}
   \centering\footnotesize
-  Sản phẩm hoàn chỉnh end-to-end — phần dữ liệu lịch sử là hướng cải thiện rõ nhất.
+  Sản phẩm hoàn chỉnh end-to-end — nâng cấp hạ tầng và quota là hướng cải thiện rõ nhất.
 \end{primarybox}
 
-\takeaway{Mạnh về AI \& hệ thống — điểm yếu chủ yếu nằm ở giả định dữ liệu \& vận hành.}
+\takeaway{Mạnh về tích hợp AI \& phân tích — hạn chế chủ yếu ở quota API \& khả năng mở rộng.}
 
 \end{frame}
 
@@ -843,16 +1044,16 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
   \draw[thick, mgray!30] (0,0) -- (4,0);
   
   % Nodes
-  \node[draw=maccent, fill=maccent!10, text=maccent, circle, minimum size=0.8cm, inner sep=0pt, font=\large] (n1) at (0,0) {\faDatabase};
+  \node[draw=maccent, fill=maccent!10, text=maccent, circle, minimum size=0.8cm, inner sep=0pt, font=\large] (n1) at (0,0) {\faExpand};
   \node[draw=mprimary, fill=mprimary!10, text=mprimary, circle, minimum size=0.8cm, inner sep=0pt, font=\large] (n2) at (1,0) {\faServer};
-  \node[draw=mprimary, fill=mprimary!10, text=mprimary, circle, minimum size=0.8cm, inner sep=0pt, font=\large] (n3) at (2,0) {\faClock};
+  \node[draw=mprimary, fill=mprimary!10, text=mprimary, circle, minimum size=0.8cm, inner sep=0pt, font=\large] (n3) at (2,0) {\faBolt};
   \node[draw=mprimary, fill=mprimary!10, text=mprimary, circle, minimum size=0.8cm, inner sep=0pt, font=\large] (n4) at (3,0) {\faUsersCog};
   \node[draw=mprimary, fill=mprimary!10, text=mprimary, circle, minimum size=0.8cm, inner sep=0pt, font=\large] (n5) at (4,0) {\faBroom};
   
   % Text below nodes
-  \node[below=8pt of n1, text=maccent, font=\bfseries\scriptsize, align=center] {Dữ liệu\\lịch sử thật};
+  \node[below=8pt of n1, text=maccent, font=\bfseries\scriptsize, align=center] {Nâng\\quota API};
   \node[below=8pt of n2, text=mgray, font=\scriptsize, align=center] {Tách\\worker};
-  \node[below=8pt of n3, text=mgray, font=\scriptsize, align=center] {Cache\\Redis TTL};
+  \node[below=8pt of n3, text=mgray, font=\scriptsize, align=center] {Event-driven\\streaming};
   \node[below=8pt of n4, text=mgray, font=\scriptsize, align=center] {Phân quyền\\RBAC};
   \node[below=8pt of n5, text=mgray, font=\scriptsize, align=center] {Dọn\\code legacy};
 \end{tikzpicture}
@@ -861,10 +1062,10 @@ Từ dữ liệu thô đa nền tảng $\to$ bản tin âm nhạc thông minh, r
 \vspace{1cm}
 \begin{accentbox}
   \centering\footnotesize
-  Ưu tiên \#1: Ghi nhận snapshot dữ liệu lịch sử $\to$ nền tảng cho dự đoán chuỗi thời gian thật.
+  Ưu tiên \#1: Nâng quota API + tách scheduler $\to$ nền tảng scale cho production thật.
 \end{accentbox}
 
-\takeaway{Hướng đi rõ ràng: lưu trữ lịch sử thật + hạ tầng tách lớp mạnh mẽ hơn.}
+\takeaway{Hướng đi rõ ràng: nâng quota + tách worker + chuyển sang event-driven.}
 
 \end{frame}
 

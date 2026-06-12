@@ -65,7 +65,8 @@ async def poll_youtube_stats():
 
 def start_scheduler():
     # Quét mỗi 6 tiếng để tối ưu quota Firebase và API (tránh rate limit)
-    scheduler.add_job(poll_lastfm_charts, IntervalTrigger(hours=6))
-    scheduler.add_job(poll_youtube_stats, IntervalTrigger(hours=6))
+    now = datetime.datetime.now(datetime.timezone.utc)
+    scheduler.add_job(poll_lastfm_charts, IntervalTrigger(hours=6), next_run_time=now)
+    scheduler.add_job(poll_youtube_stats, IntervalTrigger(hours=6), next_run_time=now)
     scheduler.start()
-    print("[Scheduler] Started background jobs (6 hours interval)")
+    print("[Scheduler] Started — chạy ngay lần đầu, rồi mỗi 6 giờ.")

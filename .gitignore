@@ -62,3 +62,10 @@ backend/.cache
 # Scratch files
 run.txt
 API.txt
+
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc

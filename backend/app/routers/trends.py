@@ -236,11 +236,19 @@ async def youtube_spike(video_id: str):
         print(f"Lỗi truy vấn history Z-score: {e}")
         
     if len(history_arr) < 5:
-        # Nếu chưa đủ data lịch sử (ví dụ scheduler chưa chạy đủ lâu), fallback
-        fake_history = [int(views * 0.55), int(views * 0.72), int(views * 0.88), views]
-        history_arr = fake_history
-    else:
-        history_arr.append(views) # Thêm view hiện tại vào cuối
+        # Bổ sung interpolation nếu chưa đủ 5 điểm (giữ data thực nếu có)
+        fill_points = [
+            int(views * 0.40),
+            int(views * 0.55),
+            int(views * 0.68),
+            int(views * 0.80),
+            int(views * 0.90),
+        ]
+        need = 5 - len(history_arr)
+        history_arr = fill_points[:need] + history_arr
+
+    # Luôn thêm view count hiện tại vào cuối (bất kể nhánh nào)
+    history_arr.append(views)
 
     spike = detect_view_spike_zscore(history_arr)
     return {**stats, "spike_detection": spike, "source": "YouTube Data API v3 + Real Z-score from DB"}

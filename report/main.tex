@@ -222,7 +222,7 @@ Dự án \textbf{World Music Intelligence Monitor} được thực hiện trong 
     & 100\% \\
 \hline
 23122015 & Nguyễn Gia Bảo &
-    \textbf{Backend:} Xây dựng toàn bộ hệ thống FastAPI (routers, services, scheduler APScheduler); tích hợp Firebase Firestore làm database; thiết kế cache 3 lớp; triển khai trên Render.com; hỗ trợ phân tích dữ liệu
+    \textbf{Backend:} Xây dựng toàn bộ hệ thống FastAPI (routers, services, scheduler APScheduler); tích hợp Firebase Firestore làm database; thiết kế cache 3 lớp; cấu hình sẵn sàng triển khai trên Render.com; hỗ trợ phân tích dữ liệu
     & 100\% \\
 \hline
 23120080 & Nguyễn Ngọc Như Quỳnh &
@@ -279,8 +279,8 @@ Một số nền tảng phân tích âm nhạc hiện có trên thị trường:
 Hệ thống được xây dựng theo kiến trúc \textbf{3-tier} rõ ràng:
 
 \begin{itemize}
-    \item \textbf{Tầng Frontend (Next.js 14):} Giao diện người dùng sử dụng App Router, TypeScript, TailwindCSS. Trực quan hoá dữ liệu bằng Recharts (bar, line, radar, donut chart). Hiệu ứng animation với Framer Motion. Quản lý state với SWR (stale-while-revalidate). Hỗ trợ dark/light mode qua next-themes. Triển khai trên Vercel, cổng 3000.
-    \item \textbf{Tầng Backend (FastAPI + Python 3.11):} Xử lý logic nghiệp vụ, điều phối AI/ML, lên lịch thu thập dữ liệu. Triển khai trên Render.com, cổng 8000.
+    \item \textbf{Tầng Frontend (Next.js 14):} Giao diện người dùng sử dụng App Router, TypeScript, TailwindCSS. Trực quan hoá dữ liệu bằng Recharts (bar, line, radar, donut chart). Hiệu ứng animation với Framer Motion. Quản lý state với SWR (stale-while-revalidate). Hỗ trợ dark/light mode qua next-themes. Hoạt động tại cổng 3000 và đã tối ưu hóa để triển khai trên Vercel.
+    \item \textbf{Tầng Backend (FastAPI + Python 3.11):} Xử lý logic nghiệp vụ, điều phối AI/ML, lên lịch thu thập dữ liệu. Hoạt động qua cổng 8000 và đã cấu hình sẵn sàng triển khai trên Render.com.
     \item \textbf{Tầng Data (Firebase Firestore + File Cache):} Lưu trữ và cache dữ liệu đã thu thập.
 \end{itemize}
 
@@ -1420,17 +1420,26 @@ Sơ đồ cơ chế quản lý và xác thực biến môi trường (Environmen
 
 \textbf{YouTube Quota:} 10.000 units/ngày. Batch fetch chỉ lấy top 8-10 tracks, tránh gọi quá nhiều.
 
-\section{Triển khai}
+\section{Kiến trúc và Kế hoạch triển khai}
+
+Hệ thống được thiết kế linh hoạt, đảm bảo hoạt động ổn định ở môi trường cục bộ (Local Development) trong quá trình phát triển đồ án, đồng thời đã thiết lập sẵn các cấu hình để có thể đưa lên nền tảng đám mây (Production) trong tương lai:
 
 \begin{itemize}
-    \item \textbf{Frontend:} Vercel (Next.js 14, port 3000)
-    \item \textbf{Backend:} Render.com (FastAPI + Uvicorn, port 8000)
-    \item \textbf{Database:} Firebase Firestore (Google Cloud)
-    \item \textbf{CI/CD:} Auto-deploy từ GitHub khi push lên main branch
+    \item \textbf{Môi trường phát triển (Local):}
+    \begin{itemize}
+        \item \textbf{Frontend:} Chạy qua Node.js ở cổng \texttt{3000}.
+        \item \textbf{Backend:} Khởi chạy bằng Uvicorn ở cổng \texttt{8000}.
+    \end{itemize}
+    \item \textbf{Môi trường Production (Kế hoạch triển khai):}
+    \begin{itemize}
+        \item \textbf{Frontend:} Mã nguồn Next.js được cấu hình sẵn để tương thích hoàn toàn với nền tảng Vercel.
+        \item \textbf{Backend:} Thiết lập sẵn \texttt{requirements.txt} và \texttt{Dockerfile} để tự động build và chạy trên nền tảng Render.com.
+        \item \textbf{CI/CD:} Đã chuẩn bị kịch bản Auto-deploy từ GitHub khi push lên nhánh \texttt{main}.
+    \end{itemize}
+    \item \textbf{Database:} Sử dụng chung cơ sở dữ liệu đám mây thực tế là Firebase Firestore (Google Cloud) cho cả quá trình phát triển và kiểm thử.
 \end{itemize}
 
-CORS được cấu hình chặt chẽ: chỉ cho phép origin từ localhost (development) và domain Vercel (production).
-
+Cấu hình CORS (Cross-Origin Resource Sharing) tại Backend cũng được thiết lập chặt chẽ: hiện tại cấp quyền truy cập đầy đủ cho \texttt{http://localhost:3000} (để chạy demo) và đã định nghĩa sẵn mảng \texttt{origins} chờ cập nhật tên miền chính thức của Vercel khi đưa lên Production.
 % ============================================================
 % CHƯƠNG 7 — KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
 % ============================================================

@@ -925,7 +925,7 @@ Bên cạnh các chỉ số tương tác thông thường, hệ thống đặc b
         node distance = 0.8cm and 1.2cm,
         box/.style = {draw, rectangle, rounded corners=5pt, minimum width=2.5cm, minimum height=1.0cm, align=center, font=\small\bfseries, line width=1pt},
         source/.style = {box, fill=borderblue!10, draw=borderblue},
-        process/.style = {box, fill=maccent!10, draw=maccent},
+        process/.style = {box, fill=maccent!10, draw=maccent, minimum width=4.2cm},
         output/.style = {box, fill=mgood!10, draw=mgood, minimum width=3.5cm},
         arrow/.style = {draw=black!70, -{Stealth[scale=1.1]}, line width=1.1pt}
     ]
@@ -957,10 +957,13 @@ Bên cạnh các chỉ số tương tác thông thường, hệ thống đặc b
         \draw [arrow] (lastfm) -- (p_lastfm);
         \draw [arrow] (sys) -- (p_sys);
         
-        \draw [arrow] (p_yt.east) -- ++(0.5,0) |- (concat.west);
-        \draw [arrow] (p_reddit.east) -- ++(0.5,0) |- (concat.west);
-        \draw [arrow] (p_lastfm.east) -- ++(0.5,0) |- (concat.west);
-        \draw [arrow] (p_sys.east) -- ++(0.5,0) |- (concat.west);
+        \coordinate (M) at ([xshift=-0.6cm]concat.west);
+        \draw [draw=black!70, line width=1.1pt] (p_yt.east) -- (p_yt.east -| M);
+        \draw [draw=black!70, line width=1.1pt] (p_reddit.east) -- (p_reddit.east -| M);
+        \draw [draw=black!70, line width=1.1pt] (p_lastfm.east) -- (p_lastfm.east -| M);
+        \draw [draw=black!70, line width=1.1pt] (p_sys.east) -- (p_sys.east -| M);
+        \draw [draw=black!70, line width=1.1pt] (p_yt.east -| M) -- (p_sys.east -| M);
+        \draw [arrow] (M) -- (concat.west);
 
         \draw [arrow] (concat) -- (vector);
         \draw [arrow] (vector) -- (xgb);

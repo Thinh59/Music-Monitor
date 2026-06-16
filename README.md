@@ -2,11 +2,8 @@
 
 > **Mục tiêu:** Xây dựng nền tảng web phân tích & dự đoán xu hướng âm nhạc toàn cầu theo real-time, tích hợp AI, có nguồn trích dẫn rõ ràng.
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-music--monitor--one.vercel.app-000000?style=for-the-badge&logo=vercel)](https://music-monitor-one.vercel.app/)
-
 [![Video Demo](https://img.youtube.com/vi/KjsEracAcn4/0.jpg)](https://youtu.be/KjsEracAcn4)
-**🔗 Live Demo:** [https://music-monitor-one.vercel.app/](https://music-monitor-one.vercel.app/)
-**🎬 Video Demo:** [https://youtu.be/KjsEracAcn4](https://youtu.be/KjsEracAcn4)
+**Video Demo:** [https://youtu.be/KjsEracAcn4](https://youtu.be/KjsEracAcn4)
 
 ---
 

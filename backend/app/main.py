@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import charts, trends, map, prediction, briefing, analysis, agent
@@ -5,17 +7,16 @@ from app.scheduler import start_scheduler
 
 app = FastAPI(title="Global Music Intelligence Monitor", version="1.0.0")
 
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"], # Tùy chỉnh lúc deploy
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
+# Cho phép localhost (mọi port) và mọi domain *.vercel.app (production + preview).
+# Có thể override bằng biến môi trường ALLOWED_ORIGIN_REGEX khi dùng domain riêng.
+ALLOWED_ORIGIN_REGEX = os.getenv(
+    "ALLOWED_ORIGIN_REGEX",
+    r"https?://(localhost|127\.0\.0\.1)(:\d+)?|https://([a-z0-9-]+\.)*vercel\.app",
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?",
+    allow_origin_regex=ALLOWED_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
